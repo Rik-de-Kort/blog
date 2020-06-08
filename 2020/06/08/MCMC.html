@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>MCMC From Scratch II: Markov Chain Monte Carlo | Nothing isn’t trivial</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="MCMC From Scratch II: Markov Chain Monte Carlo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introducing Markov Chain Monte Carlo with the Metropolis-Hastings algorithm" />
+<meta property="og:description" content="Introducing Markov Chain Monte Carlo with the Metropolis-Hastings algorithm" />
+<link rel="canonical" href="http://nothingisnttrivial.com/2020/06/08/MCMC.html" />
+<meta property="og:url" content="http://nothingisnttrivial.com/2020/06/08/MCMC.html" />
+<meta property="og:site_name" content="Nothing isn’t trivial" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-08T00:00:00-05:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://nothingisnttrivial.com/2020/06/08/MCMC.html"},"description":"Introducing Markov Chain Monte Carlo with the Metropolis-Hastings algorithm","@type":"BlogPosting","url":"http://nothingisnttrivial.com/2020/06/08/MCMC.html","headline":"MCMC From Scratch II: Markov Chain Monte Carlo","dateModified":"2020-06-08T00:00:00-05:00","datePublished":"2020-06-08T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="http://nothingisnttrivial.com/feed.xml" title="Nothing isn't trivial" /><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>MCMC From Scratch II: Markov Chain Monte Carlo | Nothing isn’t trivial</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="MCMC From Scratch II: Markov Chain Monte Carlo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introducing Markov Chain Monte Carlo with the Metropolis-Hastings algorithm" />
+<meta property="og:description" content="Introducing Markov Chain Monte Carlo with the Metropolis-Hastings algorithm" />
+<link rel="canonical" href="http://nothingisnttrivial.com/2020/06/08/MCMC.html" />
+<meta property="og:url" content="http://nothingisnttrivial.com/2020/06/08/MCMC.html" />
+<meta property="og:site_name" content="Nothing isn’t trivial" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-08T00:00:00-05:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://nothingisnttrivial.com/2020/06/08/MCMC.html"},"description":"Introducing Markov Chain Monte Carlo with the Metropolis-Hastings algorithm","@type":"BlogPosting","url":"http://nothingisnttrivial.com/2020/06/08/MCMC.html","headline":"MCMC From Scratch II: Markov Chain Monte Carlo","dateModified":"2020-06-08T00:00:00-05:00","datePublished":"2020-06-08T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="http://nothingisnttrivial.com/feed.xml" title="Nothing isn't trivial" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Nothing isn&#39;t trivial</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MCMC From Scratch II: Markov Chain Monte Carlo</h1><p class="page-description">Introducing Markov Chain Monte Carlo with the Metropolis-Hastings algorithm</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-06-08T00:00:00-05:00" itemprop="datePublished">
+        Jun 8, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      7 min read
+    
+</span></p>
+
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/Rik-de-Kort/blog/tree/master/_notebooks/2020-06-08-MCMC.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/Rik-de-Kort/blog/master?filepath=_notebooks%2F2020-06-08-MCMC.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/Rik-de-Kort/blog/blob/master/_notebooks/2020-06-08-MCMC.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-06-08-MCMC.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the previous notebook, we introduced the Eight schools problem and approached it using Bayesian statistics. The fundamental question was "how do we adjust the effect estimate for school A (which was very high) in light of what we know about the other schools?" This amounted to building a model with the parameter <code>t</code>, the "true" effect size per school. Our model also included hyperparameters <code>mu</code> and <code>sigma</code>.</p>
+<p>Picking up where we left off, we had found a probability proportion for the parameters <code>t</code>, <code>mu</code>, and <code>sigma</code>, and were left with the issue of using this probability proportion to sample from the 10-dimensional distribution. The promise then was that this would all be made possible using Markov Chain Monte Carlo (MCMC) methods. This notebook is here to fulfill that promise.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">altair</span> <span class="k">as</span> <span class="nn">alt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span><span class="p">,</span> <span class="n">uniform</span>
+
+<span class="kn">from</span> <span class="nn">mcmc</span> <span class="kn">import</span> <span class="n">json_dir</span><span class="p">,</span> <span class="n">visualize_simulation</span><span class="p">,</span> <span class="n">transition_MH_trace</span><span class="p">,</span> <span class="n">simulate_trace</span><span class="p">,</span> <span class="n">generate_sample</span><span class="p">,</span> <span class="n">make_2d_histogram</span>
+
+<span class="n">alt</span><span class="o">.</span><span class="n">data_transformers</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;json_dir&#39;</span><span class="p">,</span> <span class="n">json_dir</span><span class="p">)</span>
+<span class="n">alt</span><span class="o">.</span><span class="n">data_transformers</span><span class="o">.</span><span class="n">enable</span><span class="p">(</span><span class="s1">&#39;json_dir&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s1">&#39;/altairdata&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>DataTransformerRegistry.enable(&#39;json_dir&#39;)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">effect_estimates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">28</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span>
+<span class="n">std_estimates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
+<span class="n">school_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">]</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;effect_estimate&quot;</span><span class="p">:</span> <span class="n">effect_estimates</span><span class="p">,</span>
+                   <span class="s2">&quot;std_estimate&quot;</span><span class="p">:</span> <span class="n">std_estimates</span><span class="p">,</span>
+                  <span class="s2">&quot;school&quot;</span><span class="p">:</span> <span class="n">school_names</span><span class="p">})</span>
+
+<span class="k">def</span> <span class="nf">p_prop</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+    <span class="n">p_mu</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">8.75</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">p_sigma</span> <span class="o">=</span> <span class="n">uniform</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">p_t_mu_sigma</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">p_ee_t</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">effect_estimates</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">std_estimates</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">p_ee_t</span> <span class="o">*</span> <span class="n">p_t_mu_sigma</span> <span class="o">*</span> <span class="n">p_mu</span> <span class="o">*</span> <span class="n">p_sigma</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="What-is-a-Markov-Chain,-anyway?">What is a Markov Chain, anyway?<a class="anchor-link" href="#What-is-a-Markov-Chain,-anyway?"> </a></h1><p>Fundamentally, a Markov chain can be described as a "random walk through space". It some starting point. At each timestep, we look where we are, and decide to move somewhere else (or stay on the same spot), dependent <em>only on where we are</em>. Put differently, the next step only depends on our current location, not where we've been before that.</p>
+<p>Seeing is believing, so below an example. In this case, we are walking through a 2d-space.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">transition</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>  <span class="c1"># We always use q for the current point in these notebooks</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">q</span>  <span class="c1"># Unpack coordinates</span>
+    <span class="n">step_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Right or left with probability 0.5</span>
+    <span class="n">step_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Up or down with probability 0.5</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">step_x</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">step_y</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">transition</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">initial</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transition</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        
+    <span class="c1"># Bookkeeping</span>
+    <span class="n">n_dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                          <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dim</span><span class="p">)],</span>
+                          <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">))</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;i&quot;</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">simulate_multiple</span><span class="p">(</span><span class="n">initial_points</span><span class="p">,</span> <span class="n">transition</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs multiple markov chains using simulate(p, transition, n_iter),</span>
+<span class="sd">    one for every point p in initial_points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">simulate</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">transition</span><span class="p">,</span> <span class="n">n_iter</span><span class="p">)</span> <span class="k">for</span> <span class="n">initial</span> <span class="ow">in</span> <span class="n">initial_points</span><span class="p">],</span>
+                     <span class="n">keys</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">initial_points</span><span class="p">)),</span>
+                     <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;i&quot;</span><span class="p">],</span>
+                     <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">simulate_multiple</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)],</span> <span class="n">transition</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">visualize_simulation</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">facet</span><span class="p">(</span><span class="n">facet</span><span class="o">=</span><span class="s2">&quot;simulation&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<div id="altair-viz-9f35725ca1fc4d6891b9075f18df8d31"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-9f35725ca1fc4d6891b9075f18df8d31") {
+      outputDiv = document.getElementById("altair-viz-9f35725ca1fc4d6891b9075f18df8d31");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"url": "/altairdata/altair-data-e4a2c50bb4514c6f92701397cef62e62.json", "format": {"type": "json"}}, "facet": {"type": "quantitative", "field": "simulation"}, "spec": {"mark": "point", "encoding": {"opacity": {"condition": {"value": 1, "test": "(datum.i < iteration.i)"}, "value": 0}, "order": {"type": "quantitative", "field": "i"}, "x": {"type": "quantitative", "field": "x0", "scale": {"domain": [-22.0, 14.0]}}, "y": {"type": "quantitative", "field": "x1", "scale": {"domain": [-5.0, 17.0]}}}, "selection": {"iteration": {"type": "single", "fields": ["i"], "bind": {"input": "range", "max": 100, "min": 1, "step": 1}, "init": {"i": 1}}}}, "columns": 2, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Metropolis-Hastings">Metropolis-Hastings<a class="anchor-link" href="#Metropolis-Hastings"> </a></h1><p>By writing the transition function well, we can create a Markov chain that explores a probability distribution, without having to calculate any normalizing constants. The earliest known algorithm for this is the Metropolis-Hastings algorithm.
+The only requirement of the algorithm is that we know the probability <em>proportion</em> which we write by <code>p_prop</code>. The transition function works as follows:</p>
+<ol>
+<li>Generate a proposal for the next point, by drawing from a normal distribution centered at the current point. </li>
+<li>Calculate the probability ratio between the proposal and the current point. (The normalizing factor cancels out here so it's sufficient to have <code>p_prop</code>.) This will be high if the proposal has a higher probability than the current point.</li>
+<li>Draw a random number between 0 and 1.</li>
+<li>If the random number is less than the probability ratio, we accept the proposal. Else we don't move.</li>
+</ol>
+<p>In code:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">transition_MH</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">p_prop</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">proposal</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">current</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">uniform</span><span class="o">.</span><span class="n">rvs</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">proposal</span> <span class="k">if</span> <span class="n">u</span> <span class="o">&lt;=</span> <span class="n">p_prop</span><span class="p">(</span><span class="n">proposal</span><span class="p">)</span><span class="o">/</span><span class="n">p_prop</span><span class="p">(</span><span class="n">current</span><span class="p">)</span> <span class="k">else</span> <span class="n">current</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To see this in action, we use a slightly simpler example: we assume all standard deviations to be 1 and only consider the effect size of one school, which is, say, 0.3. Then the model we have (note the "proportional to"-sign!) for this one school is that</p>
+<p>
+$$p(t, \mu \mid \mathtt{effect\_estimates}) \propto p(\mathtt{effect\_estimates} \mid t) \cdot p(t \mid \mu) \cdot p(\mu)$$
+</p>
+<p>In code:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">p_prop</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="n">q</span>  <span class="c1"># Unpack arguments</span>
+    
+    <span class="n">p_mu</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">p_t_mu</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">p_ee_t</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">p_ee_t</span> <span class="o">*</span> <span class="n">p_t_mu</span> <span class="o">*</span> <span class="n">p_mu</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We use a tracing simulation to provide is with some info. It works just the same as the <code>transition_MH</code> function derived above.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">transition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">current</span><span class="p">:</span> <span class="n">transition_MH_trace</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">p_prop</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">simulate_trace</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">transition</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>i</th>
+      <th>x0</th>
+      <th>x1</th>
+      <th>current</th>
+      <th>f_current</th>
+      <th>proposal</th>
+      <th>f_proposal</th>
+      <th>u</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>(0, 0)</td>
+      <td>0.000000</td>
+      <td>(0, 0)</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>(0, 0)</td>
+      <td>0.000674</td>
+      <td>[-1.8489284346591206, 0.6836315761184948]</td>
+      <td>0.000017</td>
+      <td>0.228078</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>(0, 0)</td>
+      <td>0.000674</td>
+      <td>[2.2169675743945847, 0.0644415335569206]</td>
+      <td>0.000013</td>
+      <td>0.547593</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>(0, 0)</td>
+      <td>0.000674</td>
+      <td>[0.9171650385565093, -0.46792119534142007]</td>
+      <td>0.000049</td>
+      <td>0.762075</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>(0, 0)</td>
+      <td>0.000674</td>
+      <td>[-1.203043882456486, 0.32471158912139797]</td>
+      <td>0.000178</td>
+      <td>0.916377</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we make an interactive chart. The code here is <em>just</em> for plotting, so you can safely skip over it to look at the picture.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create slider</span>
+<span class="n">n_iter</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+<span class="n">slider</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">binding_range</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">n_iter</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">select_time</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">selection_single</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;iteration&quot;</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">],</span>
+                                   <span class="n">bind</span><span class="o">=</span><span class="n">slider</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+<span class="c1"># Unpack proposal and find axis scales</span>
+<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;proposal_x0&quot;</span><span class="p">,</span> <span class="s2">&quot;proposal_x1&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">proposal</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">x0</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">proposal_x0</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="nb">max</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">x0</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">proposal_x0</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">x1</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">proposal_x1</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="nb">max</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">x1</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">proposal_x1</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="n">x_scale</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">))</span>
+<span class="n">y_scale</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
+
+<span class="c1"># Create chart showing simulation</span>
+<span class="n">simulation</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">mark_point</span><span class="p">(</span><span class="n">opacity</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">x_scale</span><span class="p">),</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">y_scale</span><span class="p">),</span>
+    <span class="n">tooltip</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="s2">&quot;x1&quot;</span><span class="p">],</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">condition</span><span class="p">(</span><span class="n">alt</span><span class="o">.</span><span class="n">datum</span><span class="o">.</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">select_time</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="n">alt</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">alt</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+    <span class="n">order</span><span class="o">=</span><span class="s2">&quot;i&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create chart using proposal</span>
+<span class="n">df_proposal</span> <span class="o">=</span> <span class="n">df</span>
+<span class="n">df_proposal</span><span class="p">[[</span><span class="s2">&quot;proposal_x0&quot;</span><span class="p">,</span> <span class="s2">&quot;proposal_x1&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;proposal_x0&quot;</span><span class="p">,</span> <span class="s2">&quot;proposal_x1&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">proposal</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">mark_point</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="s2">&quot;proposal_x0&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">x_scale</span><span class="p">),</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s2">&quot;proposal_x1&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">y_scale</span><span class="p">),</span>
+    <span class="n">tooltip</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;proposal_x0&quot;</span><span class="p">,</span> <span class="s2">&quot;proposal_x1&quot;</span><span class="p">],</span>
+    <span class="n">color</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">condition</span><span class="p">(</span>
+        <span class="n">alt</span><span class="o">.</span><span class="n">datum</span><span class="o">.</span><span class="n">ratio</span> <span class="o">&gt;</span> <span class="n">alt</span><span class="o">.</span><span class="n">datum</span><span class="o">.</span><span class="n">u</span><span class="p">,</span>
+        <span class="n">alt</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="s2">&quot;blue&quot;</span><span class="p">),</span>
+        <span class="n">alt</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Create chart of probability ratio and u</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;ratio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">f_proposal</span> <span class="o">/</span> <span class="n">df</span><span class="o">.</span><span class="n">f_current</span>
+<span class="n">df_ratio</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;ratio&quot;</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">id_vars</span><span class="o">=</span><span class="s2">&quot;i&quot;</span><span class="p">)</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df_ratio</span><span class="p">)</span><span class="o">.</span><span class="n">mark_bar</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;variable&quot;</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">clamp</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
+    <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;value&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">add_selection</span><span class="p">(</span><span class="n">select_time</span><span class="p">)</span><span class="o">.</span><span class="n">transform_filter</span><span class="p">(</span>
+    <span class="n">select_time</span>
+<span class="p">)</span>
+
+<span class="c1"># Go!</span>
+<span class="p">(</span><span class="n">simulation</span> <span class="o">+</span> <span class="n">proposal</span><span class="o">.</span><span class="n">transform_filter</span><span class="p">(</span><span class="n">select_time</span><span class="p">))</span><span class="o">.</span><span class="n">add_selection</span><span class="p">(</span><span class="n">select_time</span><span class="p">)</span> <span class="o">|</span> <span class="n">ratio</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<div id="altair-viz-7945092763b241f4a8e7bea30108df14"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-7945092763b241f4a8e7bea30108df14") {
+      outputDiv = document.getElementById("altair-viz-7945092763b241f4a8e7bea30108df14");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "hconcat": [{"layer": [{"mark": {"type": "point", "opacity": 0.7}, "encoding": {"opacity": {"condition": {"value": 1, "test": "(datum.i < iteration.i)"}, "value": 0}, "order": {"type": "quantitative", "field": "i"}, "tooltip": [{"type": "quantitative", "field": "x0"}, {"type": "quantitative", "field": "x1"}], "x": {"type": "quantitative", "field": "x0", "scale": {"domain": [-1.8489284346591206, 3.9978920571631242]}}, "y": {"type": "quantitative", "field": "x1", "scale": {"domain": [-1.5899090685710509, 4.858710222841365]}}}, "selection": {"iteration": {"type": "single", "fields": ["i"], "bind": {"input": "range", "max": 100, "min": 1, "step": 1}, "init": {"i": 1}}}}, {"mark": {"type": "point", "color": "red", "filled": true, "size": 50}, "encoding": {"color": {"condition": {"value": "blue", "test": "(datum.ratio > datum.u)"}, "value": "red"}, "tooltip": [{"type": "quantitative", "field": "proposal_x0"}, {"type": "quantitative", "field": "proposal_x1"}], "x": {"type": "quantitative", "field": "proposal_x0", "scale": {"domain": [-1.8489284346591206, 3.9978920571631242]}}, "y": {"type": "quantitative", "field": "proposal_x1", "scale": {"domain": [-1.5899090685710509, 4.858710222841365]}}}, "transform": [{"filter": {"selection": "iteration"}}]}], "data": {"url": "/altairdata/altair-data-6dafdd33fed2a77776ed4bd1d42f39ae.json", "format": {"type": "json"}}}, {"data": {"url": "/altairdata/altair-data-cdd7d103e0fc212077f43fe417d5382c.json", "format": {"type": "json"}}, "mark": "bar", "encoding": {"tooltip": {"type": "quantitative", "field": "value"}, "x": {"type": "nominal", "field": "variable"}, "y": {"type": "quantitative", "field": "value", "scale": {"clamp": true, "domain": [0, 1]}}}, "selection": {"iteration": {"type": "single", "fields": ["i"], "bind": {"input": "range", "max": 100, "min": 1, "step": 1}, "init": {"i": 1}}}, "transform": [{"filter": {"selection": "iteration"}}]}], "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Comparing-it-to-the-true-distribution">Comparing it to the true distribution<a class="anchor-link" href="#Comparing-it-to-the-true-distribution"> </a></h1><p>That looks pretty interesting, but how do we fare against the real distribution? To do this, we run a Markov chain for 10000 iterations, and compare its histogram against the a plot of the actual density function, created by sampling the probability proportion in a 150x150 grid and normalizing it.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+<span class="n">y_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+
+<span class="n">transition</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">current</span><span class="p">:</span> <span class="n">transition_MH</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">p_prop</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">simulate</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">transition</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">10_000</span><span class="p">)</span>
+<span class="n">hist</span> <span class="o">=</span> <span class="n">make_2d_histogram</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x_bins</span><span class="p">,</span> <span class="n">y_bins</span><span class="p">)</span>
+
+<span class="n">sample</span> <span class="o">=</span> <span class="n">generate_sample</span><span class="p">(</span><span class="n">p_prop</span><span class="p">,</span> <span class="n">x_bins</span><span class="o">=</span><span class="n">x_bins</span><span class="p">,</span> <span class="n">y_bins</span><span class="o">=</span><span class="n">y_bins</span><span class="p">)</span>
+<span class="n">sample</span><span class="p">[</span><span class="s2">&quot;p_matched&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">p</span> <span class="o">*</span> <span class="n">hist</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># Need to rescale due to binning</span>
+<span class="n">true_density</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span><span class="o">.</span><span class="n">mark_point</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;p_matched&quot;</span><span class="p">)</span>
+
+<span class="n">hist</span> <span class="o">|</span> <span class="n">true_density</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>100%|██████████| 22500/22500 [00:06&lt;00:00, 3266.81it/s]
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+<div id="altair-viz-5df14894072a4c5fba74dbe0a4af3b37"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-5df14894072a4c5fba74dbe0a4af3b37") {
+      outputDiv = document.getElementById("altair-viz-5df14894072a4c5fba74dbe0a4af3b37");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "hconcat": [{"data": {"url": "/altairdata/altair-data-a59a1fd9f02bacf52271f3c4ef721e5f.json", "format": {"type": "json"}}, "mark": "point", "encoding": {"color": {"type": "quantitative", "field": "p"}, "x": {"type": "quantitative", "field": "x0"}, "y": {"type": "quantitative", "field": "x1"}}}, {"data": {"url": "/altairdata/altair-data-e3a32e9f4dde2ae0635016e991e5a909.json", "format": {"type": "json"}}, "mark": "point", "encoding": {"color": {"type": "quantitative", "field": "p_matched"}, "x": {"type": "quantitative", "field": "x0"}, "y": {"type": "quantitative", "field": "x1"}}}], "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That's pretty good! Let's look at the estimated means. We see that they're at least in the ball park with less than half the points (we have 22500 points in our grid, and only 10000 points in our markov chain).</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MCMC mean: </span><span class="si">{</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">x0</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">x1</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Grid sample mean: </span><span class="si">{</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">x0</span> <span class="o">@</span> <span class="n">sample</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">x1</span> <span class="o">@</span> <span class="n">sample</span><span class="o">.</span><span class="n">p</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>MCMC mean: (1.1776513919915395, 2.106161026368139)
+Grid sample mean: (1.19973972141778, 2.0994867810183075)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="How-good-is-good-enough?">How good is good enough?<a class="anchor-link" href="#How-good-is-good-enough?"> </a></h1><p>This is a natural point in the narrative to start wondering about the question of convergence. It certainly seems clear from the graphs we've drawn that the Metropolis-Hastings algorithm ends up "exploring" the distribution we want to sample from pretty well. And, as it turns out, there is a mathematical theorem proving it: as the number of samples goes to infinity, the distribution of the Markov chain will converge to the distribution of the probability proportion. So if we extend our Markov chain long enough, we will always get accurate estimates.<br />
+But therein lies the rub. What is "long enough"? When do we decide to stop a Markov chain? How do we know that our parameter estimates are accurate? We can't simply compare the MCMC-estimates to the true distribution, since <em>the whole point of MCMC is to be able to sample from a distribution we can't sample from otherwise</em>.<br />
+There do exist metrics for monitoring and improving the speed of convergence, and using Markov Chain Monte Carlo methods in practice is effectively doing these two things. Convergence is the subject of our next notebook.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Summary">Summary<a class="anchor-link" href="#Summary"> </a></h1><p>We introduced Markov chains, which can be described as a random walk through space: the next location only depends upon the previous one through a transition function. By choosing this transition function wisely, as in the Metropolis-Hasting algorithm, we can sample from a probability distribution already when we only know the probability proportion, and apparently can do so pretty well.<br />
+The question remains, <em>how</em> well? Mathematics guarantees convergence <em>eventually</em>, but that isn't a very practical guideline. Monitoring this convergence in practice will be the subject of our next notebook.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><a class="u-url" href="/2020/06/08/MCMC.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
