@@ -20,7 +20,7 @@ jobs:
     - name: convert notebooks and word docs to posts
       uses: ./_action_files
       with:
-        BOOL_SAVE_MARKDOWN: true
+        BOOL_SAVE_MARKDOWN: false
         SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
 
     - name: setup directories for Jekyll build
