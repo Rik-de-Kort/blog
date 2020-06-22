@@ -1,4 +1,93 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="http://nothingisnttrivial.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://nothingisnttrivial.com/" rel="alternate" type="text/html" /><updated>2020-06-22T11:54:22-05:00</updated><id>http://nothingisnttrivial.com/feed.xml</id><title type="html">Nothing isn’t trivial</title><entry><title type="html">MCMC From Scratch IV: Eight Schools</title><link href="http://nothingisnttrivial.com/2020/06/15/Eight-Schools.html" rel="alternate" type="text/html" title="MCMC From Scratch IV: Eight Schools" /><published>2020-06-15T00:00:00-05:00</published><updated>2020-06-15T00:00:00-05:00</updated><id>http://nothingisnttrivial.com/2020/06/15/Eight-Schools</id><content type="html" xml:base="http://nothingisnttrivial.com/2020/06/15/Eight-Schools.html">&lt;!--
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="http://nothingisnttrivial.com/feed.xml" rel="self" type="application/atom+xml" /><link href="http://nothingisnttrivial.com/" rel="alternate" type="text/html" /><updated>2020-06-22T11:59:35-05:00</updated><id>http://nothingisnttrivial.com/feed.xml</id><title type="html">Nothing isn’t trivial</title><entry><title type="html">Efficiently Detecting Anagrams</title><link href="http://nothingisnttrivial.com/markdown/2020/06/22/Anagrams.html" rel="alternate" type="text/html" title="Efficiently Detecting Anagrams" /><published>2020-06-22T00:00:00-05:00</published><updated>2020-06-22T00:00:00-05:00</updated><id>http://nothingisnttrivial.com/markdown/2020/06/22/Anagrams</id><content type="html" xml:base="http://nothingisnttrivial.com/markdown/2020/06/22/Anagrams.html">&lt;h1 id=&quot;detecting-anagrams&quot;&gt;Detecting Anagrams&lt;/h1&gt;
+&lt;p&gt;Today on Twitter, Fermat’s Library &lt;a href=&quot;https://twitter.com/fermatslibrary/status/1275066521450975234&quot;&gt;tweeted&lt;/a&gt; a cute trick to check if two words are anagrams of eachother: assign each letter a prime number, and compute the product. Two words will be anagrams if and only if the number we obtain in this manner is equal, by &lt;a href=&quot;https://en.wikipedia.org/wiki/Fundamental_theorem_of_arithmetic&quot;&gt;the fundamental theorem of arithmetic&lt;/a&gt;.&lt;br /&gt;
+Several users on Twitter were quick to point out that this runs into integer overflow issues very quickly: the letter z is assigned the 26’th prime, which is 101. Already at a string of 10 z’s you start having issues.&lt;/p&gt;
+
+&lt;p&gt;About three months ago, I encountered someone on the ##rust channel on Freenode with the exact same issue while working on &lt;a href=&quot;https://leetcode.com/problems/group-anagrams/&quot;&gt;this leetcode problem&lt;/a&gt;. The problem is a bit more specific because it requires us to group words by anagram status. Deciding to give it a shot, I managed to solve it as follows:&lt;/p&gt;
+
+&lt;p&gt;The fundamental theorem of arithmetic can be seen as the defining property of mathematical systems known as &lt;a href=&quot;https://en.wikipedia.org/wiki/Unique_factorization_domain&quot;&gt;Unique Factorization Domains&lt;/a&gt; (UFD’s). As it turns out, if we only work with integers modulo some prime (for example, we could do addition and multiplication modulo 29), the polynomials in one variable (say, $x$) turn out to form such a UFD. There are irreducible polynomials (for example $x+1$ and $x+16$) which serve the role of prime factors. Multiplication and addition go as normal for polynomials, and integer arithmetic is modulo 29.&lt;/p&gt;
+
+&lt;p&gt;Below you’ll find the code in Rust. I’ve tried to push it as fast as it would go (using my poor Rust skills), so it may look a bit hacky to Rust veterans. Additionally, it is written as a leetcode solution, but is easily convertible to a usable function in main(). The polynomials only go up to degree 7 because those are the longest word on leetcode, but the solution is easily extended to any length (up until a full memory). There are no overflow issues because we only use numbers between 0 and 28.&lt;/p&gt;
+
+&lt;p&gt;Hope you find this interesting!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-Rust&quot;&gt;use std::collections::HashMap;
+use std::ops::{Index, IndexMut, Mul};
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+struct P([u16; 7]);
+
+static N: u16 = 29;
+
+impl P {
+    fn new() -&amp;gt; P {
+        P([0u16; 7])
+    }
+    
+    fn one() -&amp;gt; P {
+        let mut result = P::new();
+        result[0] = 1;
+        result
+    }
+}
+
+impl Index&amp;lt;usize&amp;gt; for P {
+    type Output = u16;
+    
+    fn index(&amp;amp;self, i: usize) -&amp;gt; &amp;amp;Self::Output {
+        &amp;amp;self.0[i]
+    }
+}
+
+impl IndexMut&amp;lt;usize&amp;gt; for P {
+    fn index_mut(&amp;amp;mut self, i: usize) -&amp;gt; &amp;amp;mut Self::Output {
+        &amp;amp;mut self.0[i]
+    }
+}
+
+
+impl Mul for P {
+    type Output = Self;
+    
+    fn mul(self, other: Self) -&amp;gt; Self {
+        let mut result = P::new();
+        for i in 0..7 {
+            for j in 0..7-i {
+                result[i+j] = (result[i+j] + self[i]*other[j]) % N;
+            }
+        }
+        result
+    }
+}
+
+fn create_prime(a: u16) -&amp;gt; P {
+    P([a, 1, 0, 0, 0, 0, 0])
+}
+
+const ONE:P = P([1, 0, 0, 0, 0, 0, 0]);
+
+fn hash_it(i: &amp;amp;String) -&amp;gt; P {
+    i.chars().fold(ONE, |acc, c| {acc * create_prime(unsafe { std::mem::transmute::&amp;lt;char, [u16; 2]&amp;gt;(c)[0] })})
+}
+
+impl Solution {
+    fn group_anagrams(strs: Vec&amp;lt;String&amp;gt;) -&amp;gt; Vec&amp;lt;Vec&amp;lt;String&amp;gt;&amp;gt; {
+        let mut hash = HashMap::&amp;lt;P, Vec::&amp;lt;String&amp;gt;&amp;gt;::new();
+
+        for s in strs {
+            let k = hash_it(&amp;amp;s);
+
+            if let Some(list) = hash.get_mut(&amp;amp;k) {
+                list.push(s);
+            } else {
+                hash.insert(k, vec![s]);
+            }
+        }
+
+        hash.into_iter().map(|(_key, val)| val).collect()
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;</content><author><name></name></author><summary type="html">Detecting Anagrams Today on Twitter, Fermat’s Library tweeted a cute trick to check if two words are anagrams of eachother: assign each letter a prime number, and compute the product. Two words will be anagrams if and only if the number we obtain in this manner is equal, by the fundamental theorem of arithmetic. Several users on Twitter were quick to point out that this runs into integer overflow issues very quickly: the letter z is assigned the 26’th prime, which is 101. Already at a string of 10 z’s you start having issues.</summary></entry><entry><title type="html">MCMC From Scratch IV: Eight Schools</title><link href="http://nothingisnttrivial.com/2020/06/15/Eight-Schools.html" rel="alternate" type="text/html" title="MCMC From Scratch IV: Eight Schools" /><published>2020-06-15T00:00:00-05:00</published><updated>2020-06-15T00:00:00-05:00</updated><id>http://nothingisnttrivial.com/2020/06/15/Eight-Schools</id><content type="html" xml:base="http://nothingisnttrivial.com/2020/06/15/Eight-Schools.html">&lt;!--
 #################################################
 ### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
 #################################################
@@ -886,150 +975,6 @@
 &lt;/div&gt;
     
 
-&lt;/div&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Answering a Twitter Question</title><link href="http://nothingisnttrivial.com/2020/06/12/Twitter.html" rel="alternate" type="text/html" title="Answering a Twitter Question" /><published>2020-06-12T00:00:00-05:00</published><updated>2020-06-12T00:00:00-05:00</updated><id>http://nothingisnttrivial.com/2020/06/12/Twitter</id><content type="html" xml:base="http://nothingisnttrivial.com/2020/06/12/Twitter.html">&lt;!--
-#################################################
-### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
-#################################################
-# file to edit: _notebooks/2020-06-12-Twitter.ipynb
---&gt;
-
-&lt;div class=&quot;container&quot; id=&quot;notebook-container&quot;&gt;
-        
-    
-    
-&lt;div class=&quot;cell border-box-sizing code_cell rendered&quot;&gt;
-
-&lt;/div&gt;
-    
-
-&lt;div class=&quot;cell border-box-sizing text_cell rendered&quot;&gt;&lt;div class=&quot;inner_cell&quot;&gt;
-&lt;div class=&quot;text_cell_render border-box-sizing rendered_html&quot;&gt;
-&lt;h1 id=&quot;Answering-a-Twitter-question&quot;&gt;Answering a Twitter question&lt;a class=&quot;anchor-link&quot; href=&quot;#Answering-a-Twitter-question&quot;&gt; &lt;/a&gt;&lt;/h1&gt;&lt;p&gt;Someone on Twitter &lt;a href=&quot;https://twitter.com/DRyabich/status/1271188956785319941/photo/1&quot;&gt;tried to Monte Carlo simulate&lt;/a&gt; Taleb's $\kappa$ (from &lt;a href=&quot;https://arxiv.org/abs/2001.10488&quot;&gt;Statistical consequences of fat tails&lt;/a&gt;), for a normal distribution, but ran into issues. Maybe the following exposition with standard normal variables (Gaussian with mean 0, variance 1) will help.&lt;/p&gt;
-&lt;p&gt;Taleb's $\kappa$ is defined for a sum of $n$ random variables, $S_n = \sum_{i=1}^n X_n$:&lt;/p&gt;
-&lt;p&gt;
-$$\kappa_{n} = \kappa(n, n+1) = 2 - \frac{\log(n+1) - \log(n)}{\log \left ( \frac{M(n+1)}{M(n)} \right )}$$
-&lt;/p&gt;
-&lt;p&gt;where&lt;/p&gt;
-&lt;p&gt;
-$$M(n) = \mathbb{E}(\left | S_n - \mathbb{E}(S_n) \right |)$$
-&lt;/p&gt;
-&lt;p&gt;First, let's implement $\mathbb{M}(n)$. To unwrap the formula, $S_n$ is the sum of $n$ standard normal variables. As we know, &lt;a href=&quot;https://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables&quot;&gt;the sum of normal variables is normal&lt;/a&gt; and its variance is equal to the sum of the variances, and mean equal to the sum of the means. In other words, $S_n \sim N(0, n)$.&lt;/p&gt;
-&lt;p&gt;But then $\mathbb{E}(S_n) = 0$ and  the standard deviation (the &lt;code&gt;scale&lt;/code&gt; parameter in &lt;code&gt;scipy.stats.norm&lt;/code&gt;) is $\sqrt{n}$.&lt;/p&gt;
-&lt;p&gt;To calculate $\mathbb{M}(n)$ via monte carlo, we can thus take a large sample of this $S_n$, apply the absolute value function to it, and calculate the sample mean.&lt;/p&gt;
-
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-    
-    
-&lt;div class=&quot;cell border-box-sizing code_cell rendered&quot;&gt;
-&lt;div class=&quot;input&quot;&gt;
-
-&lt;div class=&quot;inner_cell&quot;&gt;
-    &lt;div class=&quot;input_area&quot;&gt;
-&lt;div class=&quot; highlight hl-ipython3&quot;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;scipy.stats&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;norm&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;n_precision&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1_000_000&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# Since we take the variables to be N(0, 1), S_i ~ N(0, sqrt(i)).&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# So E[S_i] = 0, which means that E[|S_i - E[S_i]|] = E[|S_i|].&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# So all we need to do is take n_precision samples of S_i,&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# apply the absolute value function, and then take the mean&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;norm&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rvs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n_precision&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
-
-&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;output_wrapper&quot;&gt;
-&lt;div class=&quot;output&quot;&gt;
-
-&lt;div class=&quot;output_area&quot;&gt;
-
-
-
-&lt;div class=&quot;output_text output_subarea output_execute_result&quot;&gt;
-&lt;pre&gt;[25.206322069310957,
- 25.23577354150956,
- 25.228601059383166,
- 25.202142323958526,
- 25.254476571927498,
- 25.23965574816039,
- 25.255859740411974,
- 25.2345045620554,
- 25.23934429964762,
- 25.22352113697182]&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;/div&gt;
-
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;/div&gt;
-    
-
-&lt;div class=&quot;cell border-box-sizing text_cell rendered&quot;&gt;&lt;div class=&quot;inner_cell&quot;&gt;
-&lt;div class=&quot;text_cell_render border-box-sizing rendered_html&quot;&gt;
-&lt;p&gt;And dividing &lt;code&gt;M(n+1)&lt;/code&gt; by &lt;code&gt;M(n)&lt;/code&gt;:&lt;/p&gt;
-
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-    
-    
-&lt;div class=&quot;cell border-box-sizing code_cell rendered&quot;&gt;
-&lt;div class=&quot;input&quot;&gt;
-
-&lt;div class=&quot;inner_cell&quot;&gt;
-    &lt;div class=&quot;input_area&quot;&gt;
-&lt;div class=&quot; highlight hl-ipython3&quot;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1001&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;output_wrapper&quot;&gt;
-&lt;div class=&quot;output&quot;&gt;
-
-&lt;div class=&quot;output_area&quot;&gt;
-
-
-
-&lt;div class=&quot;output_text output_subarea output_execute_result&quot;&gt;
-&lt;pre&gt;[1.0021439622692407,
- 1.0003524893992,
- 1.0002437888464653,
- 0.9999707169726871,
- 1.000976732064089,
- 1.0001976924363172,
- 1.0000014696860589,
- 0.9983938903976746,
- 0.9999057817654673,
- 0.9988688635204259]&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;/div&gt;
-
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;/div&gt;
-    
-
-&lt;div class=&quot;cell border-box-sizing text_cell rendered&quot;&gt;&lt;div class=&quot;inner_cell&quot;&gt;
-&lt;div class=&quot;text_cell_render border-box-sizing rendered_html&quot;&gt;
-&lt;p&gt;Which tends to 1 quite neatly, as expected. Note that it's not possible to plug this into the formula for $\kappa$, since $\log(1) = 0$, and we can't divide by 0!&lt;/p&gt;
-
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
 &lt;/div&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">MCMC From Scratch III: Convergence</title><link href="http://nothingisnttrivial.com/2020/06/12/Convergence.html" rel="alternate" type="text/html" title="MCMC From Scratch III: Convergence" /><published>2020-06-12T00:00:00-05:00</published><updated>2020-06-12T00:00:00-05:00</updated><id>http://nothingisnttrivial.com/2020/06/12/Convergence</id><content type="html" xml:base="http://nothingisnttrivial.com/2020/06/12/Convergence.html">&lt;!--
 #################################################
 ### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
@@ -3840,6 +3785,150 @@ $$\mathrm{var}(x) = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2$$
 &lt;li&gt;Rhat: monitoring convergence in a systematic way&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;In the final notebook, we will apply these things to our Eight Schools problem.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Answering a Twitter Question</title><link href="http://nothingisnttrivial.com/2020/06/12/Twitter.html" rel="alternate" type="text/html" title="Answering a Twitter Question" /><published>2020-06-12T00:00:00-05:00</published><updated>2020-06-12T00:00:00-05:00</updated><id>http://nothingisnttrivial.com/2020/06/12/Twitter</id><content type="html" xml:base="http://nothingisnttrivial.com/2020/06/12/Twitter.html">&lt;!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-06-12-Twitter.ipynb
+--&gt;
+
+&lt;div class=&quot;container&quot; id=&quot;notebook-container&quot;&gt;
+        
+    
+    
+&lt;div class=&quot;cell border-box-sizing code_cell rendered&quot;&gt;
+
+&lt;/div&gt;
+    
+
+&lt;div class=&quot;cell border-box-sizing text_cell rendered&quot;&gt;&lt;div class=&quot;inner_cell&quot;&gt;
+&lt;div class=&quot;text_cell_render border-box-sizing rendered_html&quot;&gt;
+&lt;h1 id=&quot;Answering-a-Twitter-question&quot;&gt;Answering a Twitter question&lt;a class=&quot;anchor-link&quot; href=&quot;#Answering-a-Twitter-question&quot;&gt; &lt;/a&gt;&lt;/h1&gt;&lt;p&gt;Someone on Twitter &lt;a href=&quot;https://twitter.com/DRyabich/status/1271188956785319941/photo/1&quot;&gt;tried to Monte Carlo simulate&lt;/a&gt; Taleb's $\kappa$ (from &lt;a href=&quot;https://arxiv.org/abs/2001.10488&quot;&gt;Statistical consequences of fat tails&lt;/a&gt;), for a normal distribution, but ran into issues. Maybe the following exposition with standard normal variables (Gaussian with mean 0, variance 1) will help.&lt;/p&gt;
+&lt;p&gt;Taleb's $\kappa$ is defined for a sum of $n$ random variables, $S_n = \sum_{i=1}^n X_n$:&lt;/p&gt;
+&lt;p&gt;
+$$\kappa_{n} = \kappa(n, n+1) = 2 - \frac{\log(n+1) - \log(n)}{\log \left ( \frac{M(n+1)}{M(n)} \right )}$$
+&lt;/p&gt;
+&lt;p&gt;where&lt;/p&gt;
+&lt;p&gt;
+$$M(n) = \mathbb{E}(\left | S_n - \mathbb{E}(S_n) \right |)$$
+&lt;/p&gt;
+&lt;p&gt;First, let's implement $\mathbb{M}(n)$. To unwrap the formula, $S_n$ is the sum of $n$ standard normal variables. As we know, &lt;a href=&quot;https://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables&quot;&gt;the sum of normal variables is normal&lt;/a&gt; and its variance is equal to the sum of the variances, and mean equal to the sum of the means. In other words, $S_n \sim N(0, n)$.&lt;/p&gt;
+&lt;p&gt;But then $\mathbb{E}(S_n) = 0$ and  the standard deviation (the &lt;code&gt;scale&lt;/code&gt; parameter in &lt;code&gt;scipy.stats.norm&lt;/code&gt;) is $\sqrt{n}$.&lt;/p&gt;
+&lt;p&gt;To calculate $\mathbb{M}(n)$ via monte carlo, we can thus take a large sample of this $S_n$, apply the absolute value function to it, and calculate the sample mean.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    
+    
+&lt;div class=&quot;cell border-box-sizing code_cell rendered&quot;&gt;
+&lt;div class=&quot;input&quot;&gt;
+
+&lt;div class=&quot;inner_cell&quot;&gt;
+    &lt;div class=&quot;input_area&quot;&gt;
+&lt;div class=&quot; highlight hl-ipython3&quot;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;scipy.stats&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;norm&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;n_precision&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1_000_000&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# Since we take the variables to be N(0, 1), S_i ~ N(0, sqrt(i)).&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# So E[S_i] = 0, which means that E[|S_i - E[S_i]|] = E[|S_i|].&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# So all we need to do is take n_precision samples of S_i,&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# apply the absolute value function, and then take the mean&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;norm&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rvs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n_precision&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;output_wrapper&quot;&gt;
+&lt;div class=&quot;output&quot;&gt;
+
+&lt;div class=&quot;output_area&quot;&gt;
+
+
+
+&lt;div class=&quot;output_text output_subarea output_execute_result&quot;&gt;
+&lt;pre&gt;[25.206322069310957,
+ 25.23577354150956,
+ 25.228601059383166,
+ 25.202142323958526,
+ 25.254476571927498,
+ 25.23965574816039,
+ 25.255859740411974,
+ 25.2345045620554,
+ 25.23934429964762,
+ 25.22352113697182]&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+    
+
+&lt;div class=&quot;cell border-box-sizing text_cell rendered&quot;&gt;&lt;div class=&quot;inner_cell&quot;&gt;
+&lt;div class=&quot;text_cell_render border-box-sizing rendered_html&quot;&gt;
+&lt;p&gt;And dividing &lt;code&gt;M(n+1)&lt;/code&gt; by &lt;code&gt;M(n)&lt;/code&gt;:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    
+    
+&lt;div class=&quot;cell border-box-sizing code_cell rendered&quot;&gt;
+&lt;div class=&quot;input&quot;&gt;
+
+&lt;div class=&quot;inner_cell&quot;&gt;
+    &lt;div class=&quot;input_area&quot;&gt;
+&lt;div class=&quot; highlight hl-ipython3&quot;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1001&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;output_wrapper&quot;&gt;
+&lt;div class=&quot;output&quot;&gt;
+
+&lt;div class=&quot;output_area&quot;&gt;
+
+
+
+&lt;div class=&quot;output_text output_subarea output_execute_result&quot;&gt;
+&lt;pre&gt;[1.0021439622692407,
+ 1.0003524893992,
+ 1.0002437888464653,
+ 0.9999707169726871,
+ 1.000976732064089,
+ 1.0001976924363172,
+ 1.0000014696860589,
+ 0.9983938903976746,
+ 0.9999057817654673,
+ 0.9988688635204259]&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+    
+
+&lt;div class=&quot;cell border-box-sizing text_cell rendered&quot;&gt;&lt;div class=&quot;inner_cell&quot;&gt;
+&lt;div class=&quot;text_cell_render border-box-sizing rendered_html&quot;&gt;
+&lt;p&gt;Which tends to 1 quite neatly, as expected. Note that it's not possible to plug this into the formula for $\kappa$, since $\log(1) = 0$, and we can't divide by 0!&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
