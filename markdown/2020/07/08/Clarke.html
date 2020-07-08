@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>About the title of this blog | Nothing isn’t trivial</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="About the title of this blog" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Inverting Clarke’s third law" />
+<meta property="og:description" content="Inverting Clarke’s third law" />
+<link rel="canonical" href="http://nothingisnttrivial.com/markdown/2020/07/08/Clarke.html" />
+<meta property="og:url" content="http://nothingisnttrivial.com/markdown/2020/07/08/Clarke.html" />
+<meta property="og:site_name" content="Nothing isn’t trivial" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-07-08T00:00:00-05:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://nothingisnttrivial.com/markdown/2020/07/08/Clarke.html"},"description":"Inverting Clarke’s third law","@type":"BlogPosting","url":"http://nothingisnttrivial.com/markdown/2020/07/08/Clarke.html","headline":"About the title of this blog","dateModified":"2020-07-08T00:00:00-05:00","datePublished":"2020-07-08T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="http://nothingisnttrivial.com/feed.xml" title="Nothing isn't trivial" /><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>About the title of this blog | Nothing isn’t trivial</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="About the title of this blog" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Inverting Clarke’s third law" />
+<meta property="og:description" content="Inverting Clarke’s third law" />
+<link rel="canonical" href="http://nothingisnttrivial.com/markdown/2020/07/08/Clarke.html" />
+<meta property="og:url" content="http://nothingisnttrivial.com/markdown/2020/07/08/Clarke.html" />
+<meta property="og:site_name" content="Nothing isn’t trivial" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-07-08T00:00:00-05:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://nothingisnttrivial.com/markdown/2020/07/08/Clarke.html"},"description":"Inverting Clarke’s third law","@type":"BlogPosting","url":"http://nothingisnttrivial.com/markdown/2020/07/08/Clarke.html","headline":"About the title of this blog","dateModified":"2020-07-08T00:00:00-05:00","datePublished":"2020-07-08T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="http://nothingisnttrivial.com/feed.xml" title="Nothing isn't trivial" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Nothing isn&#39;t trivial</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">About the title of this blog</h1><p class="page-description">Inverting Clarke's third law</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-07-08T00:00:00-05:00" itemprop="datePublished">
+        Jul 8, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      7 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#markdown">markdown</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>“Nothing isn’t trivial” seems like arrogance at best and hubris at worst. While I won’t deny that those are two qualities sometimes display, that’s not why I chose this title for my blog. I chose it because of how I conceptualize understanding. It goes as in the Andrew Wiles quote on the homepage:</p>
+
+<blockquote>
+  <p>… it’s completely dark. You stumble around bumping into the furniture but gradually you learn where each piece of furniture is. Finally, after six months or so, you find the light switch, you turn it on, and suddenly it’s all illuminated. You can see exactly where you were.</p>
+</blockquote>
+
+<p>Understanding, to me, is always like this. You struggle on a problem for days or months, or maybe even years, and along the way the light turns on, and you see that it was trivial all along. If you truly understand and master something, it will feel like a triviality. For me this happens with mathematics, but also other areas of my life, such as acrobatics. Nowadays it feels effortless for me to kick up into a handstand and just stay there for a minute or so. If you train it enough, standing on your hands really isn’t that complicated: you just push your shoulders and correct the balance with the fingers. Of course, getting all of that stuff to stick, teaching your body to execute your actions is an arduous process. But then again, that also isn’t that complicated: you have to condition your wrists and shoulders, maybe do some rebalance drills, and most of all try a whole lot. That’s it. There are some other problems you can run into, but invariably there is a small number of exercises you need to do for some time and then it will be fixed. There isn’t much thinking involved: the primary concern is putting in the work.<br />
+As I wrote the above paragraph, I asked myself: sure, doing a handstand is fairly effortless if you’re trained, but what about doing a <a href="https://i.ytimg.com/vi/xdKkH5ZAE-A/maxresdefault.jpg">victorian on the rings</a>, one of the hardest moves in gymnastics? Or what about the moves in <a href="https://en.wikipedia.org/wiki/Olympic_weightlifting">olympic weightlifting</a>? Does that ever turn trivial? After all, people train years and years for these feats. I asked an acquaintance who can do a Victorian, and he replied in a way that nicely highlights the next point.</p>
+
+<blockquote>
+  <p>It’s slightly technical, particularly the grip and how wide you hold your arms. However, you’ll learn that in no time, it’s mostly brute force!</p>
+</blockquote>
+
+<p>My experience with olympic weightlifting is (in some sense) similar. Note that I don’t know it half as well as I do handbalancing, but when you’re doing these lifts, you don’t really have time to think. It’s so heavy that there is not enough room for anything non-trivial. All you can think about is “chest up” or “more toes”, or whatever two-word cue is your favourite for the day. There are a lot of things to pay attention to, but ultimately they all have to just work, i.e. they have to get reduced to trivialities.</p>
+
+<p>We can enumerate more examples (dance, for example), but I think that’s besides the point, which is this: things one does are trivial because they have to be: the human mind simply isn’t equipped to take account of so much complexity all at once. Doing requires not thinking.</p>
+
+<p>Implicitly here, I have defined “trivial” as “requiring much thought”. Another word might be “simple”. [1]</p>
+
+<p>I think the point that I make for things one does is more general: I think <em>everything</em> has to be trivial for us to relate to and understand the world. Saying “nothing isn’t trivial” is saying the world is fundamentally understandable to the human mind. And by that I don’t mean that we immediately grasp every concept in its entirety. Just like with movement, we break down complex things into constituents that we are understandable and hence trivial. [2]</p>
+
+<p>Another way to say it is to invert Clarke’s third law:</p>
+
+<blockquote>
+  <p>Anything which looks like magic is really sufficiently advanced technology.</p>
+</blockquote>
+
+<p>And maybe you think that’s a rather bleak way of looking at the world. Magic is fun, after all. But I disagree. The observation that things <em>are</em> trivial, doesn’t imply they will always <em>seem</em> that way. Which is to say, just because there isn’t any magic doesn’t mean you won’t get to experience it. For me, something magical is <a href="https://arxiv.org/abs/1701.02434">Hamiltonian Monte Carlo</a> (that is a link to an awesome conceptual paper you should read!). I somewhat understand how all the pieces work, but, man, randomly pulling symplectic integration out of your ass and have it work with all these amazing guarantees and self-diagnostic tools is some black magic shit.<br />
+Another magical phenomenon is how complex systems arise out of these trivial interactions. Look at the lights on the street at night. The amount of work that went into getting to the point where we can have light on every corner is magical! Not only did someone have to invent the lightbulb, someone had to decide it was a good idea to put lamps and electricity everywhere, someone had to develop the tools to do that at such a large scale, someone even had to discover the material light bulbs are made of… when you track what needs to happen between the stone age and that light on the corner of the street, you discover an astounding amount of work.</p>
+
+<p>And to me, that’s maybe the most important conclusion. There is no secret sauce, but that doesn’t mean our world isn’t amazing.</p>
+
+<h2 id="notes">Notes</h2>
+<p>[1] Note that “easy” doesn’t fit the bill! There are lots of things that are simple but not easy. Lifting heavy weights is a good example: the movements are pretty simple, but it’s not easy to pull 180 kg off the floor (unless you’re Hafthor Bjornsson). Learning a handstand is simple (mostly just practice a lot), but not easy (you will fall and fall and fall…). Writing is pretty simple (just take your thoughts and put them into the computer or on paper), but not easy. 
+[2] Interesting side note here is my characterization as humans of being capable of only understanding trivial things. I believe this is true, even if your name is <a href="https://en.wikipedia.org/wiki/John_von_Neumann">John von Neumann</a>. Often people seem to split humanity in two: the intellectually gifted, and the rest. The rest can never aspire to be like the intellectually gifted, because they just don’t have what it takes to think about non-trivial problems. They assume some magic takes place in the brains of the intellectually gifted that allows them to understand nn-trivial things. I think that magic simply doesn’t exist: intellectually gifted people work mostly like everyone else, taking a complex matter and breaking it down into bite-size pieces which on their own are trivial.<br />
+I don’t mean to say that there are no differences in intellectual capacity between individual. However, the conception that people with greater intellectual capacity are essentially <em>different</em> from “the rest” seems wrong to me. In my experience tutoring, I saw essentially the same struggle for students across the board. Now you might say that the intellectually gifted will not show up in such a situation, but that’s quite simply not true; there are lots of reasons for someone to need or want tutoring, and most of those don’t have anything to do with fundamental intellectual capacity. And, at risk of sounding smug, I feel that struggle myself, and you’d be hard-pressed to find someone who knows me that thinks I don’t belong in the intellectually gifted category.
+[3] Doesn’t the world being fundamentally understandable imply something very strong? Shouldn’t we be able to perfectly predict the future? No. Just because you know how something works, doesn’t mean you can predict it. Consider the toss of a coin. In chapter 10 of “Probability Theory: The Logic of Science”, E.T. Jaynes gives a marvellous description of how the laws of physics determine a coin toss. Yet, a coin toss is a fair example of a random experiment: we have a hard time predicting its outcome in advance.</p>
+
+  </div><a class="u-url" href="/markdown/2020/07/08/Clarke.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
