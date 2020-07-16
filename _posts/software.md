@@ -6,11 +6,13 @@ categories: [markdown]
 title: Software
 ---
 
-I viscerally hate most software. Here are some programs I have the misfortune of using:
+Today, at my first day back at work, I realized something: I viscerally hate most software. Here are some programs I have the misfortune of using:
 
 - Microsoft Teams
 - Azure DevOps
+- Azure in general
 - Google Chrome
+- Google Search
 - Spotify
 - The Triodos bank app
 - Bloomberg Hypermedia API
@@ -32,7 +34,24 @@ In conclusion, Teams is a laggy, buggy piece of shit. Microsoft really embraced 
 **Azure DevOps**  
 Now that we're on the subject of agile, Azure DevOps. My god what a dumpster fire. [2] There are about forty different views 
 
+**Azure in general**  
+As part of one of my projects I wanted to try out Azure's OCR API. I'm a data scientist, so naturally I use Python to do so. A quick Google search yields Microsoft's cognitive services API. Okay, fine, seems relatively up to date, let's have a look. Turns out there are not one, but *two* quickstarts for Python. Here's my experience with the first one:
 
+[Original link](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/concept-recognizing-text), [link to quickstart](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts/csharp-hand-text), [link to Python quickstart](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts/python-hand-text), [link to Python tutorial](https://github.com/Microsoft/Cognitive-Vision-Python) (blue button at the bottom of the page). **THIS TUTORIAL DOES NOT WORK**. Not only is it written in the most horrible Python I have had the ill luck to lay eyes upon (really, you couldn't even manage to follow standard python conventions such as, I don't know, using whitespace in meaningful ways and using underscores in variable names, let alone writing readable code), it doesn't even work!
+
+The second one is using the "Python SDK", which seems little more than an OO fetishists semen spontaneously reproducing with a Python interpreter. Classes. So many fucking classes and namespace. When Tim Peters said "Namespaces are a honking great idea - let's do more of those!", he didn't mean this. I literally have to import this abomination:
+
+````python
+from azure.cognitiveservices.vision.computervision import ComputerVisionClient
+from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
+from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
+from msrest.authentication import CognitiveServicesCredentials
+````
+
+How about writing some *pythonic* code for once? Why do I keep being reminded of .NET-applications where you have classes upon classes upon classes? [Stop writing classes]().
+
+**Google Search**  
+Google search consistently delivers out of date answers and documentation. Even now I have to look very hard to avoid landing in the python 2.7 documentation. It's UNSUPPORTED. Nobody should be using it! And yet Google merrily continues linking to the python 2.7 docs. Same with Rust, anything you want to do? Let's link you to the old experimental versions! Rust is especially insidious because it's a developing language, and libraries change quickly.
 
 **Notes**  
 [1] I know there are reasons and I understand them. Doesn't make me any less mad at this useless piece of shit software.  
