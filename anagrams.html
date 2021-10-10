@@ -1,0 +1,121 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rik's Website - Anagrams</title>
+
+<style>
+body {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: sans-serif;
+  color: #222;
+}
+
+quote {
+  display: block;
+  font-family: serif;
+  background-color: #eee;
+  padding: 1em;
+  margin: 1em;
+}
+</style>
+</head>
+<body>
+<h1>Detecting Anagrams</h1>
+<p>Some time ago on Twitter, Fermat's Library <a href="https://twitter.com/fermatslibrary/status/1275066521450975234">tweeted</a> a cute trick to check if two words are anagrams of eachother: assign each letter a prime number, and compute the product. Two words will be anagrams if and only if the number we obtain in this manner is equal, by <a href="https://en.wikipedia.org/wiki/Fundamental_theorem_of_arithmetic">the fundamental theorem of arithmetic</a>.
+</p>
+<p>
+Several users on Twitter were quick to point out that this runs into integer overflow issues very quickly: the letter z is assigned the 26'th prime, which is 101. Already at a string of 10 z's you start having issues.
+</p>
+<p>
+Sometime earlier, I encountered someone on the ##rust channel on Freenode with the exact same issue while working on <a href="https://leetcode.com/problems/group-anagrams/">this leetcode problem</a>. The problem is a bit more specific because it requires us to group words by anagram status. Deciding to give it a shot, I managed to solve it as follows:
+</p>
+<p>
+The fundamental theorem of arithmetic can be seen as the defining property of mathematical systems known as <a href="https://en.wikipedia.org/wiki/Unique_factorization_domain">Unique Factorization Domains</a> (UFD's). As it turns out, if we only work with integers modulo some prime (for example, we could do addition and multiplication modulo 29), the polynomials in one variable (say, $x$) turn out to form such a UFD. There are irreducible polynomials (for example $x+1$ and $x+16$) which serve the role of prime factors. Multiplication and addition go as normal for polynomials, and integer arithmetic is modulo 29.
+</p>
+<p>
+Below you'll find the code in Rust. I've tried to push it as fast as it would go (using my poor Rust skills), so it may look a bit hacky to Rust veterans. Additionally, it is written as a leetcode solution, but is easily convertible to a usable function in main(). The polynomials only go up to degree 7 because those are the longest word on leetcode, though the solution is easily extended to any length. There are less overflow issues because we only use numbers between 0 and 28.
+</p>
+<p>Hope you find this interesting!</p>
+<pre><code class="lang-Rust">use std::collections::HashMap;
+use std::ops::{Index, IndexMut, Mul};
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+struct P([u16; 7]);
+
+static N: u16 = 29;
+
+impl P {
+    fn new() -> P {
+        P([0u16; 7])
+    }
+
+    fn one() -> P {
+        let mut result = P::new();
+        result[0] = 1;
+        result
+    }
+}
+
+impl Index<usize> for P {
+    type Output = u16;
+
+    fn index(&amp;self, i: usize) -> &amp;Self::Output {
+        &amp;self.0[i]
+    }
+}
+
+impl IndexMut<usize> for P {
+    fn index_mut(&amp;mut self, i: usize) -> &amp;mut Self::Output {
+        &amp;mut self.0[i]
+    }
+}
+
+
+impl Mul for P {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        let mut result = P::new();
+        for i in 0..7 {
+            for j in 0..7-i {
+                result[i+j] = (result[i+j] + self[i]*other[j]) % N;
+            }
+        }
+        result
+    }
+}
+
+fn create_prime(a: u16) -> P {
+    P([a, 1, 0, 0, 0, 0, 0])
+}
+
+const ONE:P = P([1, 0, 0, 0, 0, 0, 0]);
+
+fn hash_it(i: &amp;String) -> P {
+    i.chars().fold(ONE, |acc, c| {acc * create_prime(unsafe { std::mem::transmute::<char, [u16; 2]>(c)[0] })})
+}
+
+impl Solution {
+    fn group_anagrams(strs: Vec<String>) -> Vec<Vec<String>> {
+        let mut hash = HashMap::<P, Vec::<String>>::new();
+
+        for s in strs {
+            let k = hash_it(&amp;s);
+
+            if let Some(list) = hash.get_mut(&amp;k) {
+                list.push(s);
+            } else {
+                hash.insert(k, vec![s]);
+            }
+        }
+
+        hash.into_iter().map(|(_key, val)| val).collect()
+    }
+
+}
+`
+</code></pre>
+</body>
+</html>
