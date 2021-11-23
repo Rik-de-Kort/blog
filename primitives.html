@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rik's Website - Primitives for thinking</title>
+
+<style>
+body {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: sans-serif;
+  color: #222;
+}
+
+quote {
+  display: block;
+  font-family: serif;
+  background-color: #eee;
+  padding: 1em;
+  margin: 1em;
+}
+</style>
+</head>
+<body>
+<h1>Some primitives for thinking</h1>
+<p>
+Recently I've become interested in "factored designs". That is, designing composable primitives rather than monoliths solving a single problem. Like how on Unix you have a set of tools like <code>ls</code> and <code>grep</code> (I like <a href="https://github.com/BurntSushi/ripgrep">ripgrep</a>) which do one thing very well and you combine with pipes (<code>|</code>) to make more complex programs.
+This is a useful design strategy in many cases. See for instance the <a href="https://www.cs.tufts.edu/~nr/cs257/archive/don-knuth/pearls-2.pdf">Donald Knuth vs. Doug McIlroy story [PDF]</a>, or <a href="https://www.youtube.com/watch?v=3Ea3pkTCYx4">Progrmaming the Perimeter</a>.<br>
+Another example of this kind of "design" is in kitchen tools. A bench scraper can serve as a dough cutter, as a medium for transferring chopped vegetables, or as, well, a bench scraper. A knife is likewise multipurpose. A stovetop varies in heat level allowing you to do anything from poaching an egg to searing a steak. The tools "compose" to allow you to make any dish you can dream of.
+</p><p>
+With this idea of composable primitives in mind, here are some primitives that come up in my thinking (as of writing this, 2021-11-23 at 7 in the morning).
+</p>
+
+<h2>Coding principles are information principles</h2>
+<p>
+I'm naturally interested in computers and programming, and over the years I have learned a lot about it. Programming is first and foremost about making the computer do what you want. The secondary concern is code reuse, maintainability, extendability, etc. Most coding principles focus around this secondary concern, which is primarily about conveying information.<br>
+</p>
+
+<p>
+An example of this is the value of having a stable API surface. In order to rely on a piece of software, it's important that it doesn't change every three weeks at the whims of its programmer. Similarly, it is socially useful to be predictable: if you are trying to communicate with someone, it's really distracting when they change their communication style every 5 minutes, going from formal to jovial to stand-offish, from preferring writing to preferring talking to preferring telepathy, etc.
+Note that this predictability is not actual communication. It's the context that allows you to communicate, similar to how a stable API allows you effectively program against it to do the things you wanted to do in the first place.
+</p>
+
+<p>
+Another example is in how to organize information. Everyone who has built a sufficiently large system knows that there are many decisions to make in organizing your code base. Tradeoffs abound: do you encapsulate everything in small functions so that the intention of the code or high-level narrative is easy to read, or do you inline most items so that you can read to see what is actually happening? How do you split up your code in modules and namespaces (if at all)? Do you put the tests with the code, in a separate file next to the code, or in a separate folder altogether?
+All of the answers to these questions have advantages and disadvantages, and they are directly related to how we consume information. Encapsulating everything in small functions means your code is easy to read and parse at a high level: it very clearly communicates the overall mental model underlying the code. However, it is difficult to keep track of all the tiny pieces of the program when you're trying to debug some error somewhere in one of the functions, especially if they are layered: abstractions will always leak. It's more difficult to get the gist with inlined code, but debugging is comparatively easy: if there's no abstraction, there can't be a leak.
+Similarly, when you communicate, you can choose to stay high-level and approachable, or to go low-level with lots of detail. The tradeoffs are largely the same.
+</p>
+
+<h2>Everything is tradeoffs</h2>
+
+<h2>Interesting things happen at the boundary</h2>
+
+<h2>Discontinuities are an interesting form of boundary</h2>
+
+<h2>Any measure that becomes a target ceases to be a good measure</h2>
+Also known as Goodhart's Law.
+
+<h2>One man's modus ponens is another's modus tollens</h2>
+<p>
+I got this from <a href="https://www.gwern.net/Modus">Gwern</a>. The basic idea is that if someone says "A implies B, and I believe A, therefore B", you can always say "I don't believe B, therefore A must not be true".
+</p><p>
+For me the most common application of this principle is in spot-checking a model. If I train a model on some task and see very high scores (accuracy, log-loss, doesn't matter) right away, my immediate conclusion is that something is not right. Pretty much always I find that the answers have leaked into the training somehow (for instance by encoding them twice in the data, but only taking them out once).
+Though of course it doesn't have to be this way. My girlfriend showed me a plot she made with R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out it was a calibration curve and she is really fucking good at pipetting.
+</p>
+</body>
+</html>
