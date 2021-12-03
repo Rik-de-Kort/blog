@@ -47,7 +47,24 @@ All of the answers to these questions have advantages and disadvantages, and the
 Similarly, when you communicate, you can choose to stay high-level and approachable, or to go low-level with lots of detail. The tradeoffs are largely the same.
 </p>
 
-<h2>Everything is tradeoffs</h2>
+<h2>One man's modus ponens is another's modus tollens</h2>
+<p>
+I got this from <a href="https://www.gwern.net/Modus">Gwern</a>. The basic idea is that if someone says "A implies B, and I believe A, therefore B", you can always say "I don't believe B, therefore A must not be true".
+</p><p>
+For me the most common application of this principle is in spot-checking a model. If I train a model on some task and see very high scores (accuracy, log-loss, doesn't matter) right away, my immediate conclusion is that something is not right. Pretty much always I find that the answers have leaked into the training somehow (for instance by encoding them twice in the data, but only taking them out once).
+Though of course it doesn't have to be this way. My girlfriend showed me a plot she made with R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out it was a calibration curve and she is really fucking good at pipetting.
+</p>
+
+<h2>There Ain't No Such Thing As A Free Lunch, or: everything is tradeoffs</h2>
+<p>
+If you've ever the incomprehensible acronym TANSTAAFL, this is what it means. When making a choice, it's a lot more likely that there are tradeoffs between the options, rather than one option being strictly better than the other ones.
+</p><p>
+One famous example is the non-arbitrage criterion in economic markets (like the stock market). If there is an "arbitrage", a way to make free money (i.e. there exists a strategy that provides return without any risk), then somebody will most likely have applied that strategy already. Prices adjust accordingly, closing the gap in the market, and this way of making free money ceases to exist. Another way to think about it that there is huge demand for free lunches: if you don't show up super super early, they're all gone!
+</p><p>
+The organizing of information example from above is also present here. There is no "best way" to organize information. There are things that definitely help, like search tools, indexing tools, etc., but at the core whether you split your code up into 7-line functions or write one big script is about making a tradeoff between "high-level" and "low-level" readability.
+</p><p>
+Another example is with baking, especially bread. Do I let this go another 5 minutes in the oven and develop a richer, crunchier crust, and risk burning it, or do I pull it out now so that I won't break my teeth on it later.
+</p>
 
 <h2>Interesting things happen at the boundary</h2>
 
@@ -56,13 +73,6 @@ Similarly, when you communicate, you can choose to stay high-level and approacha
 <h2>Any measure that becomes a target ceases to be a good measure</h2>
 Also known as Goodhart's Law.  TODO: write some bit about generic risks of automation
 
-<h2>One man's modus ponens is another's modus tollens</h2>
-<p>
-I got this from <a href="https://www.gwern.net/Modus">Gwern</a>. The basic idea is that if someone says "A implies B, and I believe A, therefore B", you can always say "I don't believe B, therefore A must not be true".
-</p><p>
-For me the most common application of this principle is in spot-checking a model. If I train a model on some task and see very high scores (accuracy, log-loss, doesn't matter) right away, my immediate conclusion is that something is not right. Pretty much always I find that the answers have leaked into the training somehow (for instance by encoding them twice in the data, but only taking them out once).
-Though of course it doesn't have to be this way. My girlfriend showed me a plot she made with R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out it was a calibration curve and she is really fucking good at pipetting.
-</p>
 https://twitter.com/danluu/status/1434655493037993984
 </body>
 </html>
