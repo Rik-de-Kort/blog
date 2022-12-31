@@ -34,14 +34,10 @@ With this idea of composable primitives in mind, here are some primitives that c
 <h2>Coding principles are information principles</h2>
 <p>
 I'm naturally interested in computers and programming, and over the years I have learned a lot about it. Programming is first and foremost about making the computer do what you want. The secondary concern is code reuse, maintainability, extendability, etc. Most coding principles focus around this secondary concern, which is primarily about conveying information.<br>
-</p>
-
-<p>
+</p><p>
 An example of this is the value of having a stable API surface. In order to rely on a piece of software, it's important that it doesn't change every three weeks at the whims of its programmer. Similarly, it is socially useful to be predictable: if you are trying to communicate with someone, it's really distracting when they change their communication style every 5 minutes, going from formal to jovial to stand-offish, from preferring writing to preferring talking to preferring telepathy, etc.
 Note that this predictability is not actual communication. It's the context that allows you to communicate, similar to how a stable API allows you effectively program against it to do the things you wanted to do in the first place.
-</p>
-
-<p>
+</p><p>
 Another example is in how to organize information. Everyone who has built a sufficiently large system knows that there are many decisions to make in organizing your code base. Tradeoffs abound: do you encapsulate everything in small functions so that the intention of the code or high-level narrative is easy to read, or do you inline most items so that you can read to see what is actually happening? How do you split up your code in modules and namespaces (if at all)? Do you put the tests with the code, in a separate file next to the code, or in a separate folder altogether?
 All of the answers to these questions have advantages and disadvantages, and they are directly related to how we consume information. Encapsulating everything in small functions means your code is easy to read and parse at a high level: it very clearly communicates the overall mental model underlying the code. However, it is difficult to keep track of all the tiny pieces of the program when you're trying to debug some error somewhere in one of the functions, especially if they are layered: abstractions will always leak. It's more difficult to get the gist with inlined code, but debugging is comparatively easy: if there's no abstraction, there can't be a leak.
 Similarly, when you communicate, you can choose to stay high-level and approachable, or to go low-level with lots of detail. The tradeoffs are largely the same.
@@ -51,8 +47,10 @@ Similarly, when you communicate, you can choose to stay high-level and approacha
 <p>
 I got this from <a href="https://www.gwern.net/Modus">Gwern</a>. The basic idea is that if someone says "A implies B, and I believe A, therefore B", you can always say "I don't believe B, therefore A must not be true".
 </p><p>
-For me the most common application of this principle is in spot-checking a model. If I train a model on some task and see very high scores (accuracy, log-loss, doesn't matter) right away, my immediate conclusion is that something is not right. Pretty much always I find that the answers have leaked into the training somehow (for instance by encoding them twice in the data, but only taking them out once).
-Though of course it doesn't have to be this way. My girlfriend showed me a plot she made with R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out it was a calibration curve and she is really fucking good at pipetting.
+For me the most common application of this principle is in spot-checking a model built using machine learning. If I train a model on some task and see it do very well on my metrics right away, I can either conclude that my model is amazing, and I've done a great job (the model is great, therefore the scores are great), or I can get suspicious and start investigating the other direction (scores can't be this great, therefore the model can't be great and something's wrong).
+In pretty much all cases I find that the answers have leaked into the training somehow (for instance by encoding them twice in the data, but only taking them out once).
+</p><p>
+Though of course it doesn't have to be this way. My girlfriend showed me a plot she made with R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out it she is just really good at pipetting and we were looking at a calibration curve for that.
 </p>
 
 <h2>There Ain't No Such Thing As A Free Lunch, or: everything is tradeoffs</h2>
@@ -60,15 +58,19 @@ Though of course it doesn't have to be this way. My girlfriend showed me a plot 
 If you've ever the incomprehensible acronym TANSTAAFL, this is what it means. When making a choice, it's a lot more likely that there are tradeoffs between the options, rather than one option being strictly better than the other ones.
 </p><p>
 One famous example is the non-arbitrage criterion in economic markets (like the stock market). If there is an "arbitrage", a way to make free money (i.e. there exists a strategy that provides return without any risk), then somebody will most likely have applied that strategy already. Prices adjust accordingly, closing the gap in the market, and this way of making free money ceases to exist. Another way to think about it that there is huge demand for free lunches: if you don't show up super super early, they're all gone!
+However, do not that life happens in the pre-asymptote: <em>someone</em> needs to eat that lunch, and that could be you..
 </p><p>
 The organizing of information example from above is also present here. There is no "best way" to organize information. There are things that definitely help, like search tools, indexing tools, etc., but at the core whether you split your code up into 7-line functions or write one big script is about making a tradeoff between "high-level" and "low-level" readability.
 </p><p>
-Another example is with baking, especially bread. Do I let this go another 5 minutes in the oven and develop a richer, crunchier crust, and risk burning it, or do I pull it out now so that I won't break my teeth on it later.
+Another example is with baking, especially bread. Do I let this go another 5 minutes in the oven and develop a richer, crunchier crust, and risk burning it, or do I pull it out now so that I won't break my teeth on it later?
 </p>
 
 <h2>Interesting things happen at the boundary</h2>
-
-<h2>Discontinuities are an interesting form of boundary</h2>
+<p>
+This is a tautology: by "boundary", I mean any "location" where something of interest changes. For instance, if you are lifting a heavy weight, you already start pushing before the weight moves. Once the weight moves, that's a boundary: you are putting enough force into the weight to overcome gravity.
+</p><p>
+In a work-oriented or business-oriented setting, interesting boundaries to explore are "when would this be feasible?" or "when does this start to make money?" I remember reading about Elon Musk using the first question to decide to start Tesla, and the second frame is of course used in companies around the world.
+</p>
 
 <h2>Any measure that becomes a target ceases to be a good measure</h2>
 Also known as Goodhart's Law.  TODO: write some bit about generic risks of automation
