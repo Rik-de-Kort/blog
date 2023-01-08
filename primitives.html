@@ -43,15 +43,15 @@ All of the answers to these questions have advantages and disadvantages, and the
 Similarly, when you communicate, you can choose to stay high-level and approachable, or to go low-level with lots of detail. The tradeoffs are largely the same.
 </p>
 
-<h2>One man's modus ponens is another's modus tollens</h2>
+<h2>Inverting an implication, or "One man's modus ponens is another's modus tollens"</h2>
 <p>
 I got this from <a href="https://www.gwern.net/Modus">Gwern</a>. The basic idea is that if someone says "A implies B, and I believe A, therefore B", you can always say "I don't believe B, therefore A must not be true".
 </p><p>
 For me the most common application of this principle is in spot-checking a model built using machine learning. If I train a model on some task and see it do very well on my metrics right away, I can either conclude that my model is amazing, and I've done a great job (the model is great, therefore the scores are great), or I can get suspicious and start investigating the other direction (scores can't be this great, therefore the model can't be great and something's wrong).
 In pretty much all cases I find that the answers have leaked into the training somehow (for instance by encoding them twice in the data, but only taking them out once).
+Of course it doesn't have to always be this way (see also "Don't outsource your thinking to an aphorism"). My girlfriend showed me a linear regression with an R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out, we were looking at a calibration curve for some kind of solution, and she's really good a pipetting.
 </p><p>
-Though of course it doesn't have to be this way. My girlfriend showed me a plot she made with R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out it she is just really good at pipetting and we were looking at a calibration curve for that.
-</p>
+Someone who is very good at this is Dan Luu
 
 <h2>There Ain't No Such Thing As A Free Lunch, or: everything is tradeoffs</h2>
 <p>
@@ -62,19 +62,29 @@ However, do not that life happens in the pre-asymptote: <em>someone</em> needs t
 </p><p>
 The organizing of information example from above is also present here. There is no "best way" to organize information. There are things that definitely help, like search tools, indexing tools, etc., but at the core whether you split your code up into 7-line functions or write one big script is about making a tradeoff between "high-level" and "low-level" readability.
 </p><p>
-Another example is with baking, especially bread. Do I let this go another 5 minutes in the oven and develop a richer, crunchier crust, and risk burning it, or do I pull it out now so that I won't break my teeth on it later?
+Another example is with baking. For something like bread, do I let this go another 5 minutes in the oven and develop a richer, crunchier crust, or do I pull it out now so that I won't break my teeth on it later? Neither one is "optimal" in a mathematical sense: it just depends on what you want out of that particular loaf. Viewed from this perspective, this principle is a good help if you're struggling to make a decision: everything is tradeoffs, so stop looking for some mathematically optimal point, and just pick.
 </p>
 
 <h2>Interesting things happen at the boundary</h2>
 <p>
 This is a tautology: by "boundary", I mean any "location" where something of interest changes. For instance, if you are lifting a heavy weight, you already start pushing before the weight moves. Once the weight moves, that's a boundary: you are putting enough force into the weight to overcome gravity.
 </p><p>
-In a work-oriented or business-oriented setting, interesting boundaries to explore are "when would this be feasible?" or "when does this start to make money?" I remember reading about Elon Musk using the first question to decide to start Tesla, and the second frame is of course used in companies around the world.
+This is a useful principle to make decisions. Don't just ask "what should I do?", but ask "in what situation would I make a different choice". If you have to choose between A and B, imagine a scenario in which you would choose A without a moment's thought, and imagine another scenario in which you would choose B without a moment's thought. Then ask yourself which things are the same in both scenarios, and which things are different. This should give you a handle on which "axes" are interesting to keep investigate in your decision.
+</p><p>
+For example, in a work-oriented setting, we might ask whether we should start a project or not. A scenario where we definitely would start it, is if it would make us boatloads of money. A scenario where we definitely would not start it, is if nobody will pay for it (or people will pay to avoid it). The boundary there is break-even, when the project costs exactly as much as it brings in. It should be noted that there are different ways of reaching break-even: you might run your project on a shoestring budget and only make a little money out of it (like an independently developed film or video game), or you might run it big with a lot of budget, and make a lot of money selling it to a mainstream audience (like a big budget film or AAA video game).
+</p><p>
+What I like about this method is that you don't specify the interesting axes up front: you distill them from the scenario's you come up with. In the original version of the example above, I also included how fun the project was to work on as an axis (I took it out to make the example as simple as possible). While this complicates the decision, it may be very relevant. Again, everything is tradeoffs, so that is to be expected.
 </p>
 
-<h2>Any measure that becomes a target ceases to be a good measure</h2>
-Also known as Goodhart's Law.  TODO: write some bit about generic risks of automation
-
-https://twitter.com/danluu/status/1434655493037993984
+<h2>Don't outsource your thinking to an aphorism</h2>
+<p>
+This is something I catch myself saying a lot lately. An aphorism or a principle will likely not be able to capture the nuanced tradeoffs in a decision you make, or an opinion you form. Principles are useful, and aphorisms can deliver wisdom, when applied at the right time and in the right context. The trouble comes when they are taken out of their context, and applied without thinking. Our world is rich and varied: while individual decisions can often be "flattened" into a yes-no question along a single axis (an example of finding boundaries), there is no axis which allows you to do this with all decisions. And if you think you have found one, well, one man's modus ponens...
+</p><p>
+This principle is also a good way to distinguish between an expert and someone who doesn't know what they're doing (or worse, a zealot). When someone brings up a principle or aphorism, ask yourself whether they have outsourced their thinking to it. Experts will rarely do so, and you can learn a great deal this way: why specifically this principle in this context? On the other hand, if someone doesn't know what they're doing, it often pays to examine the applicability of the principle in question.
+</p><p>
+The phrase "life happens in the pre-asymptote" is also an example of this. The aphorism is the asymptote in this case: a clear line where something or the other is true. Example: a common aphorism in the financial world is "the market can stay irrational for longer than you can stay solvent", meaning that it's often not worth it to go for an arbitrage opportunity. However, don't outsource your thinking for an aphorism, and think whether it really applies. 
+</p><p>
+There's a link to <a href="https://en.wikipedia.org/wiki/Goodhart%27s_law">Goodhart's Law</a> here: "any measure that becomes a target, ceases to be a good measure". A measure is an aphorism with extra steps: a low-dimensional representation of a high-dimensional trade-off space.
+</p>
 </body>
 </html>
