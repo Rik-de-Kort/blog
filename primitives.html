@@ -23,23 +23,22 @@ quote {
 </head>
 <body>
 <h1>Some primitives for thinking</h1>
+<h2>Introduction</h2>
 <p>
 Recently I've become interested in "factored designs". That is, designing composable primitives rather than monoliths solving a single problem. Like how on Unix you have a set of tools like <code>ls</code> and <code>grep</code> (I like <a href="https://github.com/BurntSushi/ripgrep">ripgrep</a>) which do one thing very well and you combine with pipes (<code>|</code>) to make more complex programs.
-This is a useful design strategy in many cases. See for instance the <a href="https://www.cs.tufts.edu/~nr/cs257/archive/don-knuth/pearls-2.pdf">Donald Knuth vs. Doug McIlroy story [PDF]</a>, or <a href="https://www.youtube.com/watch?v=3Ea3pkTCYx4">Progrmaming the Perimeter</a>.<br>
+This is a useful design strategy in many cases. See for instance the <a href="https://www.cs.tufts.edu/~nr/cs257/archive/don-knuth/pearls-2.pdf">Donald Knuth vs. Doug McIlroy story [PDF]</a>, or <a href="https://www.youtube.com/watch?v=3Ea3pkTCYx4">Programming the Perimeter</a>.<br>
 Another example of this kind of "design" is in kitchen tools. A bench scraper can serve as a dough cutter, as a medium for transferring chopped vegetables, or as, well, a bench scraper. A knife is likewise multipurpose. A stovetop varies in heat level allowing you to do anything from poaching an egg to searing a steak. The tools "compose" to allow you to make any dish you can dream of.
-</p><p>
-With this idea of composable primitives in mind, here are some primitives that come up in my thinking (as of writing this, 2021-11-23 at 7 in the morning).
 </p>
 
 <h2>Coding principles are information principles</h2>
 <p>
 I'm naturally interested in computers and programming, and over the years I have learned a lot about it. Programming is first and foremost about making the computer do what you want. The secondary concern is code reuse, maintainability, extendability, etc. Most coding principles focus around this secondary concern, which is primarily about conveying information.<br>
 </p><p>
-An example of this is the value of having a stable API surface. In order to rely on a piece of software, it's important that it doesn't change every three weeks at the whims of its programmer. Similarly, it is socially useful to be predictable: if you are trying to communicate with someone, it's really distracting when they change their communication style every 5 minutes, going from formal to jovial to stand-offish, from preferring writing to preferring talking to preferring telepathy, etc.
+An example of this is the value of having a stable API surface. In order to rely on a piece of software, it's important that it doesn't change every three weeks at the whims of its programmer. Similarly, it is socially useful to be predictable (I first read about this in one of D.R. Maciver's newsletters): if you are trying to communicate with someone, it's really distracting when they change their communication style every 5 minutes, going from formal to jovial to stand-offish, from preferring writing to preferring talking to preferring telepathy, etc.
 Note that this predictability is not actual communication. It's the context that allows you to communicate, similar to how a stable API allows you effectively program against it to do the things you wanted to do in the first place.
 </p><p>
-Another example is in how to organize information. Everyone who has built a sufficiently large system knows that there are many decisions to make in organizing your code base. Tradeoffs abound: do you encapsulate everything in small functions so that the intention of the code or high-level narrative is easy to read, or do you inline most items so that you can read to see what is actually happening? How do you split up your code in modules and namespaces (if at all)? Do you put the tests with the code, in a separate file next to the code, or in a separate folder altogether?
-All of the answers to these questions have advantages and disadvantages, and they are directly related to how we consume information. Encapsulating everything in small functions means your code is easy to read and parse at a high level: it very clearly communicates the overall mental model underlying the code. However, it is difficult to keep track of all the tiny pieces of the program when you're trying to debug some error somewhere in one of the functions, especially if they are layered: abstractions will always leak. It's more difficult to get the gist with inlined code, but debugging is comparatively easy: if there's no abstraction, there can't be a leak.
+Another example is in how to organize information. Everyone who has built a sufficiently large system knows that there are many decisions to make in organizing your code base. Tradeoffs abound: do you encapsulate everything in small functions so that the intention of the code or high-level narrative is easy to read, or do you inline most items so that you can read to see what is actually happening? How do you split up your code in modules and namespaces (if at all)? Do you put the tests with the code, in a separate file next to the code, or in a separate folder altogether?<br>
+All of the answers to these questions have advantages and disadvantages, and they are directly related to how we consume information. Encapsulating everything in small functions means your code is easy to read and parse at a high level: it very clearly communicates the overall mental model underlying the code. However, it is difficult to keep track of all the tiny pieces of the program when you're trying to debug some error somewhere in one of the functions, especially if they are layered: abstractions will always leak. It's more difficult to get the gist with inlined code, but debugging is comparatively easy: if there's no abstraction, there can't be a leak.<br>
 Similarly, when you communicate, you can choose to stay high-level and approachable, or to go low-level with lots of detail. The tradeoffs are largely the same.
 </p>
 
@@ -48,17 +47,16 @@ Similarly, when you communicate, you can choose to stay high-level and approacha
 I got this from <a href="https://www.gwern.net/Modus">Gwern</a>. The basic idea is that if someone says "A implies B, and I believe A, therefore B", you can always say "I don't believe B, therefore A must not be true".
 </p><p>
 For me the most common application of this principle is in spot-checking a model built using machine learning. If I train a model on some task and see it do very well on my metrics right away, I can either conclude that my model is amazing, and I've done a great job (the model is great, therefore the scores are great), or I can get suspicious and start investigating the other direction (scores can't be this great, therefore the model can't be great and something's wrong).
-In pretty much all cases I find that the answers have leaked into the training somehow (for instance by encoding them twice in the data, but only taking them out once).
-Of course it doesn't have to always be this way (see also "Don't outsource your thinking to an aphorism"). My girlfriend showed me a linear regression with an R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out, we were looking at a calibration curve for some kind of solution, and she's really good a pipetting.
-</p><p>
-Someone who is very good at this is Dan Luu
+In pretty much all cases I find that the answers have leaked into the training somehow (for instance by encoding them twice in the data, but only taking them out once).<br>
+Of course it doesn't have to always be this way (see also "Don't outsource your thinking to an aphorism"). My girlfriend showed me a linear regression with an R-squared of 99.9 percent. I said there must have obviously been some kind of mistake, but turns out a callibration curve for someone who is accurate at pipetting will show this kind of result routinely.
+</p>
 
 <h2>There Ain't No Such Thing As A Free Lunch, or: everything is tradeoffs</h2>
 <p>
-If you've ever the incomprehensible acronym TANSTAAFL, this is what it means. When making a choice, it's a lot more likely that there are tradeoffs between the options, rather than one option being strictly better than the other ones.
+If you've ever encountered the incomprehensible acronym TANSTAAFL, this is what it means. When making a choice, it's a lot more likely that there are tradeoffs between the options, rather than one option being strictly better than the other ones.
 </p><p>
 One famous example is the non-arbitrage criterion in economic markets (like the stock market). If there is an "arbitrage", a way to make free money (i.e. there exists a strategy that provides return without any risk), then somebody will most likely have applied that strategy already. Prices adjust accordingly, closing the gap in the market, and this way of making free money ceases to exist. Another way to think about it that there is huge demand for free lunches: if you don't show up super super early, they're all gone!
-However, do not that life happens in the pre-asymptote: <em>someone</em> needs to eat that lunch, and that could be you..
+However, do note that life happens in the pre-asymptote: <em>someone</em> needs to eat that lunch, and that could be you..
 </p><p>
 The organizing of information example from above is also present here. There is no "best way" to organize information. There are things that definitely help, like search tools, indexing tools, etc., but at the core whether you split your code up into 7-line functions or write one big script is about making a tradeoff between "high-level" and "low-level" readability.
 </p><p>
@@ -69,9 +67,9 @@ Another example is with baking. For something like bread, do I let this go anoth
 <p>
 This is a tautology: by "boundary", I mean any "location" where something of interest changes. For instance, if you are lifting a heavy weight, you already start pushing before the weight moves. Once the weight moves, that's a boundary: you are putting enough force into the weight to overcome gravity.
 </p><p>
-This is a useful principle to make decisions. Don't just ask "what should I do?", but ask "in what situation would I make a different choice". If you have to choose between A and B, imagine a scenario in which you would choose A without a moment's thought, and imagine another scenario in which you would choose B without a moment's thought. Then ask yourself which things are the same in both scenarios, and which things are different. This should give you a handle on which "axes" are interesting to keep investigate in your decision.
+This is a useful principle to make decisions. Don't just ask "what should I do?", but ask "in what situation is the choice obvious, and in what situation would I make a different choice?". If you have to choose between A and B, imagine a scenario in which you would choose A without a moment's thought, and imagine another scenario in which you would choose B without a moment's thought. Then ask yourself which things are the same in both scenarios, and which things are different. This should give you a handle on which "axes" are interesting to keep investigate in your decision.
 </p><p>
-For example, in a work-oriented setting, we might ask whether we should start a project or not. A scenario where we definitely would start it, is if it would make us boatloads of money. A scenario where we definitely would not start it, is if nobody will pay for it (or people will pay to avoid it). The boundary there is break-even, when the project costs exactly as much as it brings in. It should be noted that there are different ways of reaching break-even: you might run your project on a shoestring budget and only make a little money out of it (like an independently developed film or video game), or you might run it big with a lot of budget, and make a lot of money selling it to a mainstream audience (like a big budget film or AAA video game).
+For example, in a work-oriented setting, we might ask whether we should start a project or not. A scenario where we definitely would start it, is if it would make us boatloads of money. A scenario where we definitely would not start it, is if nobody will pay for it (or people will pay to avoid it). The boundary there is break-even, when the project costs exactly as much as it brings in. It should be noted that there are different ways of reaching break-even: you might run your project on a shoestring budget and only make a little money out of it (like an independently developed film), or you might run it big with a lot of budget, and make a lot of money selling it to a mainstream audience (like a big budget film).
 </p><p>
 What I like about this method is that you don't specify the interesting axes up front: you distill them from the scenario's you come up with. In the original version of the example above, I also included how fun the project was to work on as an axis (I took it out to make the example as simple as possible). While this complicates the decision, it may be very relevant. Again, everything is tradeoffs, so that is to be expected.
 </p>
@@ -82,9 +80,26 @@ This is something I catch myself saying a lot lately. An aphorism or a principle
 </p><p>
 This principle is also a good way to distinguish between an expert and someone who doesn't know what they're doing (or worse, a zealot). When someone brings up a principle or aphorism, ask yourself whether they have outsourced their thinking to it. Experts will rarely do so, and you can learn a great deal this way: why specifically this principle in this context? On the other hand, if someone doesn't know what they're doing, it often pays to examine the applicability of the principle in question.
 </p><p>
-The phrase "life happens in the pre-asymptote" is also an example of this. The aphorism is the asymptote in this case: a clear line where something or the other is true. Example: a common aphorism in the financial world is "the market can stay irrational for longer than you can stay solvent", meaning that it's often not worth it to go for an arbitrage opportunity. However, don't outsource your thinking for an aphorism, and think whether it really applies. 
+The phrase "life happens in the pre-asymptote" (first heard this from N.N. Taleb) is also an example of this. The aphorism is the asymptote in this case: a clear line where something or the other is true. Example: a common aphorism in the financial world is "the market can stay irrational for longer than you can stay solvent", meaning that it's often not worth it to go for an arbitrage opportunity. However, don't outsource your thinking for an aphorism, and think whether it really applies. 
 </p><p>
 There's a link to <a href="https://en.wikipedia.org/wiki/Goodhart%27s_law">Goodhart's Law</a> here: "any measure that becomes a target, ceases to be a good measure". A measure is an aphorism with extra steps: a low-dimensional representation of a high-dimensional trade-off space.
+</p>
+
+
+<h2>Conclusion</h2>
+<p>
+There's a fair amount of primitives that I use for thinking:
+<ul>
+    <li>Coding principles are information principles</li>
+    <li>One man's modus ponens is another's modus tollens</li>
+    <li>TANSTAAFL, or everything is tradeoffs</li>
+    <li>Interesting things happen at the boundary</li>
+    <li>Don't outsource your thinking to an aphorism</li>
+</ul>
+
+Their use lies not in the application of a single one at a time, but rather in applying to the various problems that I encounter in daily life.
+</p><p>
+I feel weird putting a call to action here, but: do you have any primitives that you think are useful? Do you think there are any examples where this principles are actively hindering good thinking? Let me know (like on Twitter, or wherever, really)!
 </p>
 </body>
 </html>
