@@ -1,0 +1,37 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rik's Website - Laws of physics for software</title>
+
+<style>
+body {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: sans-serif;
+  color: #222;
+}
+
+quote {
+  display: block;
+  font-family: serif;
+  background-color: #eee;
+  padding: 1em;
+  margin: 1em;
+}
+</style>
+</head>
+<body>
+    <h1>The "laws of physics" for software</h1>
+    <p>Ever heard how Fred Brooks said the programmer works only slightly removed from "pure thought-stuff". Anything you can imagine, you can build! A conclusion people seem to draw from this idea is that there are no rules governing software. I wanted to write a bit about how I don't think that is true.</p>
+    <p>Everything has to have some interface with reality: it has to have impact on reality and has to be impacted by reality. This is how we discover the laws of physics: we observe that an apple, once released, falls down to the ground, and so we discover gravity. To discover "the laws of physics" of software, we need to look at where software touches reality. Here is a first list:</p>
+    <ul>
+        <li>Programmers work on the software. They are an active participant in the process, and part of the "external reality" of the software.</li>
+        <li>The software is interacted with by a user. If the software exposes an interface (like a webapp), the user and their system is part of the external reality of the software. The programmer working on the software can be seen as a special case of this: the source code is an interface.</li>
+        <li>The software is executed by a computer. This usually has some effect on memory in the computer, and can have further downstream effects such as the opening of bridges, transfer of asset ownership, your toast popping up, etc.</li>
+    </ul>
+    <p>
+    Which restrictions do these external realities impose on the software? For the work of programmers, there are several limitations. The ones that come to mind immediately are the capacity of their machines, the availability of memory, etc. More importantly, though, there are limitations in the programmers themselves. Human memory is not infinite and the complexity of information that one can grasp is limited, and as more programmers are introduced to a project, communication quickly becomes a bottleneck. A line of Python saying <code>bm = sorted((r for r in data if r.sedol in bm_sedols), key=lambda t: mc[t] / sum(mc.values()))</code> might be perfectly legible to me: it's just finding records belong in some benchmark, sorting them by market cap. But if you don't know what a benchmark is in this context, that a sedol is an identifier, what market cap is, you are lost. Or what if you don't know Python, or you doi know Python but you don't know about list comprehensions, or the optional <code>key</code> argument to <code>sorted</code>?
+    </p>
+</body>
+</html>
