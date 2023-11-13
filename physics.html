@@ -33,5 +33,13 @@ quote {
     <p>
     Which restrictions do these external realities impose on the software? For the work of programmers, there are several limitations. The ones that come to mind immediately are the capacity of their machines, the availability of memory, etc. More importantly, though, there are limitations in the programmers themselves. Human memory is not infinite and the complexity of information that one can grasp is limited, and as more programmers are introduced to a project, communication quickly becomes a bottleneck. A line of Python saying <code>bm = sorted((r for r in data if r.sedol in bm_sedols), key=lambda t: mc[t] / sum(mc.values()))</code> might be perfectly legible to me: it's just finding records belong in some benchmark, sorting them by market cap. But if you don't know what a benchmark is in this context, that a sedol is an identifier, what market cap is, you are lost. Or what if you don't know Python, or you doi know Python but you don't know about list comprehensions, or the optional <code>key</code> argument to <code>sorted</code>?
     </p>
+    <p>
+    Programming is a lot like writing in this way: a book or other piece of writing with some direct use. The writing needs to be appropriate to the audience, and take them into account. If not, the writing is ineffective and doesn't achieve its intended goal. So with programming, it matters not only what the program is doing, but also who you are writing it <em>for</em>. Their knowledge fundamentally constrains how you can write your program.
+    </p>
+    <p>
+    A direct corollary is a guideline for comments. Which is to say: it depends on who the comments are for. A common guideline like "comment the what, not the how" becomes much easier to apply with this in mind. More importantly, it becomes much easier to <em>break</em> the guideline when you need to. Some exampels of commenting the how instead of the what follow.
+    </p>
+    <blockquote>Turning these numbers into integers *has* to be done with a .astype(np.int64). If we use .astype(int), Numpy will take a 32-bit integer on Windows platforms, which is not large enough for our data. See https://github.com/numpy/numpy/issues/17640</blockquote>
+    <blockquote></blockquote>
 </body>
 </html>
