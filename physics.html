@@ -77,7 +77,7 @@ trade = [
     </p>
     <pre><code>var result []int
 for index, item := range items {
-    result = append(result, f(item))
+    result = append(result, f(item))Wh
 }</code></pre>
     <p>
     In Python, however, I can immediately think of three reasonable ways to do it:
@@ -101,5 +101,18 @@ result = map(f, items)</code></pre>
     <p>
     Of course, this standardization also has downsides. I prefer the list-comprehension style in Python since it's closer to the natural language description of the task. It's a bit like writing a book using the only the 1000 most common English words: you have to say "food-heating radio box" instead of "microwave". But the underlying force shaping this balance is still communication. Standardization might just help.
     </p>
+
+    <h2>A user interacts with the software</h2>
+    <p>
+    Programmers at least share the ability to talk to the computer in a programming language, but users run the gamut from a 75-year old hacker who could write the same software in a weekend to a 3-year old using a computer for the first time. You can even count other computer programs as users (ever tried having a go at fuzz testing?) Without making any other assumptions, it is really hard to pin down any regularity from the reality of users using your software, other than tthe reality of users using your software, other than that there is going to be a lot of variation.
+    </p>
+    <p>
+    However, it does point to a simple maxim: plan for variation. Often I feel like people take that to mean that one should really try to lock down the system and try to prevent any unforeseen actions from occurring. This is a never-ending battle and (in my experience) leads to fighting demons that don't exist. Rather, it's worth to focus on the things that are really crucial, be it some process that must always be available, or some data invariants that must never be broken, and build the rest of the system flexibly around that. An example:
+    </p>
+    <p>
+    For an investment management team at work I maintain a system that collects information and their views on their investable universe. The system is also used to generate trade proposals from this information. Even if the data from one name in the universe is unavailable, for instance due to a data error in one of the sources, the system should still display all other relevant information. You can't just simply blow up at the first <code>ZeroDivisionError</code> you see.
+    </p>
+
+<small><a href="index.html">home</a></small>
 </body>
 </html>
