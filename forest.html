@@ -16,24 +16,29 @@
 <li>Extensibility: do I have a fixed set of operations for this <code>Thing</code> (that I might be able to evolve through inheritance), or can I write whatever methods?</li>
 </ul>
 <p>I grouped equality and identity because they are <em>the same</em>: a notion of equality induces a notion of identity. Things are identical (have the same identity) if they are equal. The question is whether there is only one notion of equality or multiple. In some languages identity is by-value, i.e. two values are the same if they are bit-for-bit equal. In others identity is by-place, i.e. two values are the same thing only if they are at the same spot in memory.</p>
+
+<h2>Places and values</h2>
 <p>I think this points at a better distinction: <a href="https://without.boats/blog/pinned-places/">places and values</a>.
 At the very basis of it, most programming is operating on bits in memory and transforming them.
 The processing unit reads bits from memory, does some calculations on them, then writes them back to memory.
 Hopefully the bits it wrote go on to do some good in the world, like showing a nice picture on your computer screen or the answer to your mathematics homework.
-It's essential to know <em>what</em> (value) these bits  are and <em>where</em> (place) they are.
-In regular programming, values are data, and places are references, or pointers, or addresses.
+To make sure the right bits are written to the right locations, it's essential to know <em>what</em> (value) these bits  are and <em>where</em> (place) they are.
 </p>
 <p>
-"Data" in the distinction between "data" and "objects" has a clear story in terms of places and values: the notion of place is completely managed by the programming language. When you program, you only concern yourself with the values and their transformation.
+Programming languages are mostly way of making the problem of dealing with reading, transforming, and writing the right bits from the right spot tractable for humans. Some ideas that help: encoding higher-level notions as bits, and working with those higher-level notions. Things like ASCII (<code>00001010</code> means a newline <code>\n</code>), or <a href="https://www.altdevarts.com/p/onboarding-floating-point">floating point numbers</a>, or even integers. (This is what people mean when they say "C is a high-level language".)
 </p>
 <p>
-"Objects", on the other hand, seem to not have a clear story. Objects have identity (i.e. a sense of place)
+"Data" in the distinction between "data" and "objects" has a clear story in terms of places and values: the notion of place is completely managed by the programming language. When you program, you only concern yourself with the values and their transformation. It doesn't matter whether your first <code>23857</code> is at the same place your second <code>23857</code>. The programming language (compiler/interpreter/runtime) will take care of it.
+</p>
+<p>
+"Objects", on the other hand, seem to not have a clear story. Objects do have a place (i.e. identity), but this is almost incidental.
 </p>
 
 <p>The distinctions are not very clearly explained in the text, and I think they are muddy at best. Coming from Python, a method on a class is just a function taking an instance of that class. This is completely the same as extensibility in the "data"-column. But methods are also overrideable. This is conflating <em>where</em> calculations are defined with <em>where they can be accessed</em>.</p>
 <p>I think there are only two fundamental distinctions between the columns: that of notions of equality, and encapsulation (can you hide things).</p>
 
 
+In regular programming, values are data, and places are references, or pointers, or addresses.
 
 
 </body>
