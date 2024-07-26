@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rik's Website - Missing the Forest for the Trees</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Missing the Forest for the Trees</h1>
+<p>I always start writing hot on the tails of some flare of an idea, with no guarantee that it'll work out. Here's this one:</p>
+<quote>Discussing Object-Oriented Programming versus Functional Programming is missing the forest for the trees</quote>
+<p>I'm spurred on by some (quite interesting) <a href="https://www.tedinski.com/2018/01/23/data-objects-and-being-railroaded-into-misdesign.html">work</a> by Ted Kaminski. In the linked post, he makes a distinction between "data" and "objects", based on the following five characteristics:</p>
+<ul>
+<li>Equality and Identity: are two values, say <code>23857</code> and <code>23857</code> always the same, or can they have a different identity?</li>
+<li>Mutability: can I turn this <code>23857</code> into <code>23856</code>, or not?</li>
+<li>Abstraction: can I hide the details of how <code>Thing</code> is implemented, or is <code>Thing</code> just data?</li>
+<li>Extensibility: do I have a fixed set of operations for this <code>Thing</code> (that I might be able to evolve through inheritance), or can I write whatever methods?</li>
+</ul>
+<p>I grouped equality and identity because they are <em>the same</em>: a notion of equality induces a notion of identity. Things are identical (have the same identity) if they are equal. The question is whether there is only one notion of equality or multiple. In some languages identity is by-value, i.e. two values are the same if they are bit-for-bit equal. In others identity is by-place, i.e. two values are the same thing only if they are at the same spot in memory.</p>
+<p>I think this points at a better distinction: <a href="https://without.boats/blog/pinned-places/">places and values</a>. Values are data: the <em>bytes themselves</em>. Places are references and pointers, information about <em>where</em> the bytes are.</p>
+<p>At the very basis of it, programming is making the machine do what needs doing. Bits are read from memory, we do some calculations on them, then bits are written to memory, and they go on to do some good in the world (hopefully).</p>
+
+<p>The distinctions are not very clearly explained in the text, and I think they are muddy at best. Coming from Python, a method on a class is just a function taking an instance of that class. This is completely the same as extensibility in the "data"-column. But methods are also overrideable. This is conflating <em>where</em> calculations are defined with <em>where they can be accessed</em>.</p>
+<p>I think there are only two fundamental distinctions between the columns: that of notions of equality, and encapsulation (can you hide things).</p>
+
+
+
+
+</body>
+</html>
