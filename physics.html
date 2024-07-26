@@ -11,8 +11,7 @@
 
     <p>To find out what these laws are, consider that everything has to have some interface with reality: it has to have impact on reality and has to be impacted by reality. This is how we discover the laws of physics: we observe that an apple, once released, falls down to the ground, and so we discover gravity. To discover "the laws of physics" of software, we need to look at where software touches reality. Here is a first list:</p>
     <ul>
-        <li>Programmers work on the software. They are an active participant in the process, and part of the "external reality" of the software.</li>
-        <li>The software is interacted with by a user. If the software exposes an interface (like a webapp), the user and their system is part of the external reality of the software. The programmer working on the software can be seen as a special case of this: the source code is an interface.</li>
+        <li>The software is interacted with. If the software exposes an interface (like a webapp), the user and their system is part of the external reality of the software. The programmer working on the software can be seen as a special case of this: the source code is an interface.</li>
         <li>The software is executed by a computer. This usually has some effect on memory in the computer, and can have further downstream effects such as the opening of bridges, transfer of asset ownership, your toast popping up, etc.</li>
     </ul>
     <h2>Programmers that work on software</h2>
@@ -56,7 +55,7 @@ trade = [
 
     <h3>The power of standardization</h3>
     <p>
-    I think much of the success of the programming language Go is predicated on the fact that communication between programmers really matters. By restricting the power of the language, it introduces uniformity, which is often useful in communication. The receiver knows what to expect and has less overhead dealing with the sender's idiosyncrasies. For instance, if you want to apply some function <code>f</code> to a slice <code>items</code>, here's how to do it:
+    Another application of this force is the success of the programming language Go. By restricting the power of the language, Go creates uniformity, which is often useful in communication. The receiver knows what to expect and has less overhead dealing with the sender's idiosyncrasies. For instance, if you want to apply some function <code>f</code> to a slice <code>items</code>, here's how to do it:
     </p>
     <pre><code>var result []int
 for index, item := range items {
@@ -79,10 +78,12 @@ result = map(f, items)</code></pre>
     There are arguments to be made for and against each of these ways, but in Go there is no such discussion. Go has no list comprehensions or <code>map</code>-builtin. There's only one reasonable way to do it. And if you are reading other people's code, you only need to understand the one way to do it for Golang, but understand three ways to do it for Python (if you are unlucky).
     </p>
     <p>
-    The contrast is similar to the contrast between plugging a cable into your phone and plugging a cable into an electric socket. Plugging in your phone depends on whether or not you have an iPhone (Lightning cable or not), if you have USB-C or old USB, and maybe even what kind of old USB (mini or micro). The electric outlet mostly just work by sticking it in: you don't need to think about it.
+    Of course, this standardization also has downsides. I prefer the list-comprehension style in Python since it's closer to the natural language description of the task. It's a bit like writing a book using the only the 1000 most common English words: you have to say "food-heating radio box" instead of "microwave". So "you should standardize things" is not a law, but the underlying force shaping this balance is still communication.
     </p>
+
+    <h2>Users interacting with software</h2>
     <p>
-    Of course, this standardization also has downsides. I prefer the list-comprehension style in Python since it's closer to the natural language description of the task. It's a bit like writing a book using the only the 1000 most common English words: you have to say "food-heating radio box" instead of "microwave". But the underlying force shaping this balance is still communication. Standardization might just help.
+    Most software has a non-trivial use. It is often used by people who did not create the software, who do not necessarily understand the underlying mental model that the programmer writing the software had (if they had). This is a major source of variability. At least programmers have the ability to think rigorously about the computer in common. Users may not have this ability, and consider the computer to be more or less a magic box.
     </p>
 
     <h2>A user interacts with the software</h2>
