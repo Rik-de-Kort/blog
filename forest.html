@@ -31,7 +31,12 @@ Programming languages are mostly way of making the problem of dealing with readi
 "Data" in the distinction between "data" and "objects" has a clear story in terms of places and values: the notion of place is completely managed by the programming language. When you program, you only concern yourself with the values and their transformation. It doesn't matter whether your first <code>23857</code> is at the same place your second <code>23857</code>. The programming language (compiler/interpreter/runtime) will take care of it.
 </p>
 <p>
-"Objects", on the other hand, seem to not have a clear story. Objects do have a place (i.e. identity), but this is almost incidental.
+"Objects", on the other hand, don't have such a clear story. Objects do have a place, but this feels almost incidental: in my experience, object identity shows up mostly as a footgun when you are trying to see whether two things are equal.
+A better design here is to compare by-value by default and only by-place on request.
+</p>
+<p>
+Sure, there might be infinite performance overhead because objects
+Rather, "objects" seems to center around the notion of information hiding (encapsulation) and inheritance.
 </p>
 
 <p>The distinctions are not very clearly explained in the text, and I think they are muddy at best. Coming from Python, a method on a class is just a function taking an instance of that class. This is completely the same as extensibility in the "data"-column. But methods are also overrideable. This is conflating <em>where</em> calculations are defined with <em>where they can be accessed</em>.</p>
