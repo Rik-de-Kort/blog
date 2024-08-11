@@ -13,3 +13,8 @@ quote {
   padding: 1em;
   margin: 1em;
 }
+
+th, td {
+  padding-left: 1em;
+  text-align: left;
+}

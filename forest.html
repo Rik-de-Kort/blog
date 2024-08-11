@@ -25,22 +25,49 @@ Hopefully the bits it wrote go on to do some good in the world, like showing a n
 To make sure the right bits are written to the right locations, it's essential to know <em>what</em> (value) these bits  are and <em>where</em> (place) they are.
 </p>
 <p>
-Programming languages are mostly way of making the problem of dealing with reading, transforming, and writing the right bits from the right spot tractable for humans. Some ideas that help: encoding higher-level notions as bits, and working with those higher-level notions. Things like ASCII (<code>00001010</code> means a newline <code>\n</code>), or <a href="https://www.altdevarts.com/p/onboarding-floating-point">floating point numbers</a>, or even integers. (This is what people mean when they say "C is a high-level language".)
+Programming languages are mostly way of making the problem of dealing with reading, transforming, and writing the right bits from the right spot tractable for humans. Some ideas that help: encoding higher-level notions as bits, and working with those higher-level notions. Things like ASCII (<code>00001010</code> means a newline <code>\n</code>), or <a href="https://www.altdevarts.com/p/onboarding-floating-point">floating point numbers</a>, or even integers. (This is part of what people mean when they say "C is a high-level language".)
 </p>
 <p>
 "Data" in the distinction between "data" and "objects" has a clear story in terms of places and values: the notion of place is completely managed by the programming language. When you program, you only concern yourself with the values and their transformation. It doesn't matter whether your first <code>23857</code> is at the same place your second <code>23857</code>. The programming language (compiler/interpreter/runtime) will take care of it.
 </p>
 <p>
-"Objects", on the other hand, don't have such a clear story. Objects do have a place, but this feels almost incidental: in my experience, object identity shows up mostly as a footgun when you are trying to see whether two things are equal.
-A better design here is to compare by-value by default and only by-place on request.
+"Objects", on the other hand, don't have such a clear story. Objects do have a place, but this feels almost incidental: in my experience, object identity shows up mostly as a footgun when you are trying to see whether two things are equal: all's well and good when you're slinging integers and strings, but you wrap something in a class (maybe to define a vector type, which still admits addition, multiplication, etc.), and you get completely different behaviour.
 </p>
 <p>
-Sure, there might be infinite performance overhead because objects
-Rather, "objects" seems to center around the notion of information hiding (encapsulation) and inheritance.
+As a result, the distinctions between "data" and "objects" are not very clearly explained in the text, and I think they are muddy at best. Coming from Python, a method on a class is just a function taking an instance of that class, and you can always replace it with your own function. There is no such thing as a private method; does that mean that Python does not fall in the "objects" category?
+</p>
+<p>
+I do not think the table is entirely without merit. "Objects" and "data" are clearly pointing at <em>something</em> that a lot of programmers recognize.
+However, I think this thinking <em>in general</em> is muddied, and by looking at it from the perspective of places and values, we can start to tease apart some distinctions.
+</p>
+<h2>"Objects" vs "data", clarified</h2>
+<p>
+If you want to modify things (i.e. have mutability), you need to embrace the fact that places have a value. You have to be able to <em>point</em> to a value to say "modify that one".
+This is not how the "data" or "functional" style operates: we pretend every value we create exists in a diferent place, and so we never have to worry about modifying things, and especially accidentally modifying things.
+</p>
+<p>
+But this alone does not make for an "objects" style, or object-oriented programming. A language like C is definitely not object-oriented, but it does have a notion of place (pointers) and allows you to modify values.
 </p>
 
-<p>The distinctions are not very clearly explained in the text, and I think they are muddy at best. Coming from Python, a method on a class is just a function taking an instance of that class. This is completely the same as extensibility in the "data"-column. But methods are also overrideable. This is conflating <em>where</em> calculations are defined with <em>where they can be accessed</em>.</p>
-<p>I think there are only two fundamental distinctions between the columns: that of notions of equality, and encapsulation (can you hide things).</p>
+<p>
+Note that this is separate from the notion of encapsulation. 
+</p>
+
+<table>
+<tr><th>Aspect</th><th>Data</th><th>Objects</th></tr>
+<tr>
+  <td>Places</td>
+  <td>No notion of place</td>
+  <td>Objects have a memory address</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+</table>
+
+
 
 
 In regular programming, values are data, and places are references, or pointers, or addresses.
