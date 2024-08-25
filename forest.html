@@ -22,19 +22,53 @@
 At the very basis of it, most programming is operating on bits in memory and transforming them.
 The processing unit reads bits from memory, does some calculations on them, then writes them back to memory.
 Hopefully the bits it wrote go on to do some good in the world, like showing a nice picture on your computer screen or the answer to your mathematics homework.
-To make sure the right bits are written to the right locations, it's essential to know <em>what</em> (value) these bits  are and <em>where</em> (place) they are.
+To make sure the right bits are written to the right locations, it's essential to know <em>what</em> these bits are (value) and <em>where</em>  they are (place).
 </p>
 <p>
-Programming languages are mostly way of making the problem of dealing with reading, transforming, and writing the right bits from the right spot tractable for humans. Some ideas that help: encoding higher-level notions as bits, and working with those higher-level notions. Things like ASCII (<code>00001010</code> means a newline <code>\n</code>), or <a href="https://www.altdevarts.com/p/onboarding-floating-point">floating point numbers</a>, or even integers. (This is part of what people mean when they say "C is a high-level language".)
+Programming languages are mostly way of making the problem of dealing with reading, transforming, and writing the right bits from the right spot tractable for humans.
+Some ideas that help: encoding higher-level notions as bits, and working with those higher-level notions.
+Things like ASCII (<code>00001010</code> means a newline <code>\n</code>), or <a href="https://www.altdevarts.com/p/onboarding-floating-point">floating point numbers</a>, or even integers.
+(This is part of what people mean when they say "C is a high-level language".)
 </p>
 <p>
-"Data" in the distinction between "data" and "objects" has a clear story in terms of places and values: the notion of place is completely managed by the programming language. When you program, you only concern yourself with the values and their transformation. It doesn't matter whether your first <code>23857</code> is at the same place your second <code>23857</code>. The programming language (compiler/interpreter/runtime) will take care of it.
+"Data" in the distinction between "data" and "objects" has a clear story in terms of places and values: the notion of place is completely managed by the programming language.
+When you program, you only concern yourself with the values and their transformation. 
+It doesn't matter whether your first <code>23857</code> is at the same place your second <code>23857</code>. 
+The programming language (compiler/interpreter/runtime) will take care of it.
 </p>
 <p>
 "Objects", on the other hand, don't have such a clear story. Objects do have a place, but this feels almost incidental: in my experience, object identity shows up mostly as a footgun when you are trying to see whether two things are equal: all's well and good when you're slinging integers and strings, but you wrap something in a class (maybe to define a vector type, which still admits addition, multiplication, etc.), and you get completely different behaviour.
 </p>
 <p>
-As a result, the distinctions between "data" and "objects" are not very clearly explained in the text, and I think they are muddy at best. Coming from Python, a method on a class is just a function taking an instance of that class, and you can always replace it with your own function. There is no such thing as a private method; does that mean that Python does not fall in the "objects" category?
+I think the distinction between "data" and "objects" as explained in Kaminski's text is muddy at best.
+Of course, people still debate "functional" versus "object-oriented" programming, which correspond to "data" and "objects", but because the distinction between the two is not clear, the debate cannot be resolved.
+</p>
+<h2>"Functional" versus "object-oriented", clarified</h2>
+<p>
+Going forward I will use the more common terms "functional" and "object-oriented programming".
+</p>
+<p>
+We already established that the notion of places and values provides a distinction between functional and object-oriented programming: functional languages choose to have places completely managed by the programming language, and you only ever think about values.
+ In object-oriented languages, it's typical to have some notion of <em>this</em> object and <em>that</em> object.
+</p>
+<p>
+The next question we should ask is: what <em>is</em> an "object"?
+I would argue that an object (as commonly implemented) is a tying together of <em>state</em> and <em>behaviour</em>.
+State are the values on <code>self</code> or <code>this</code>, or whatever is the common keyword in your language.
+Behaviour are the functions or methods working with those values: either producing new ones, manipulating them, or having side effects.
+</p>
+<p>
+The point of this whole exercise is what fancy people call <em>encapsulation</em>, or information hiding. You can think of an object as a <em>thing</em> that <em>does</em> something.
+That's where the common names come from: <code>InformationManager</code>, <code>UserController</code>, <code>Helper</code>, etc. You don't need to know <em>how</em> the information is managed, the user is controlled, or you are getting helped. You can rely on the object to do it for you.
+</p>
+<p>
+But that's strange. In the encapsulation story, we are talking a lot about behaviour, and not so much about state. What's that about?
+</p>
+<br>
+
+<p>
+Coming from Python, a method on a class is just a function taking an instance of that class, and you can always replace it with your own function.
+There is no such thing as a private method; does that mean that Python does not fall in the "objects" category?
 </p>
 <p>
 I do not think the table is entirely without merit. "Objects" and "data" are clearly pointing at <em>something</em> that a lot of programmers recognize.
