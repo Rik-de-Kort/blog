@@ -43,7 +43,7 @@ The programming language (compiler/interpreter/runtime) will take care of it.
 I think the distinction between "data" and "objects" as explained in Kaminski's text is muddy at best.
 Of course, people still debate "functional" versus "object-oriented" programming, which correspond to "data" and "objects", but because the distinction between the two is not clear, the debate cannot be resolved.
 </p>
-<h2>"Functional" versus "object-oriented", clarified</h2>
+<h2>What are "objects", anyway?</h2>
 <p>
 Going forward I will use the more common terms "functional" and "object-oriented programming".
 </p>
@@ -62,7 +62,38 @@ The point of this whole exercise is what fancy people call <em>encapsulation</em
 That's where the common names come from: <code>InformationManager</code>, <code>UserController</code>, <code>Helper</code>, etc. You don't need to know <em>how</em> the information is managed, the user is controlled, or you are getting helped. You can rely on the object to do it for you.
 </p>
 <p>
-But that's strange. In the encapsulation story, we are talking a lot about behaviour, and not so much about state. What's that about?
+But that's strange: we are talking a lot about behaviour, and not so much about state.
+What's up with that?
+</p>
+<p>
+To reiterate, the point of programming is to take bits, transform them, and put the result somewhere.
+The behaviour described above is doing just that.
+You are not <em>supposed</em> to touch the object's state when using it, that's the object's job.
+</p>
+<p>
+This can be very nice to work with, for instance when you have a program that is used for algorithmically trading securities.
+You need a part of the program to talk to the exchange, react to data from it, and adjust orders accordingly, but you also need a nice user interface for the trader to see what's happening, to adjust the algorithm mid-run, emergency stop it if necessary, etc.
+These two parts of the program cannot interlink too much: the fast part needs to be <em>fast</em>, you cannot spend time making nice graphs for someone to maybe look at.
+Notice also that there's a clear concept of what the trading part of the program is <em>doing</em>. Naming it is a bit more difficult, but typically if it's something that has to do with the exchange, this part is doing it.
+</p>
+<p>
+It can also be not so nice to work with, for instance when you need to calculate the square root of the number formed by taking the 1000th to 1250th digits of pi expressed in base 6. First you calculate the relevant digits, and then you calculate the square root. A <code>PiCalculator</code> is not helping you here, it just gets in the way of what you are trying to do. 
+</p>
+<p>
+The difference between these two lies in what state there is to manage.
+In the former example, the exchange is continually sending data, and the trading part has to keep track of what algorithms are running, which orders they correspond to, etc. There's a lot of fairly complex state.
+Whereas in the latter example, there is no state to speak of. 250 digits of pi, that's it. You can write that out by hand if you want.
+</p>
+<h2>What are objects not?</h2>
+<p>
+You are not <em>supposed</em> to touch the object's state (or internals), but this is not always enforced.
+For instance, in Python you can do whatever you want to whichever object you want, including builtins.
+You can even adjust the behaviour of an object by replacing the methods by functions of your own.
+A language like Java has the <code>private</code> keyword that helps with enforcement.
+</p>
+<p>
+A notion of places is not required for objects to exist.
+You can emulate any object by writing methods that take in the current state of the object and output the new state (along with whatever other data they produce).
 </p>
 <br>
 
