@@ -6,6 +6,8 @@
 </head>
 <body>
 <h1>Missing the Forest for the Trees</h1>
+Main thesis: "object oriented programming" is more of a pointer to "mainstream programming", "functional programming" is a pointer to a bunch of slightly related concepts.
+
 <p>I always start writing hot on the tails of some flare of an idea, with no guarantee that it'll work out. Here's this one:</p>
 <quote>Discussing Object-Oriented Programming versus Functional Programming is missing the forest for the trees</quote>
 <p>I'm spurred on by some (quite interesting) <a href="https://www.tedinski.com/2018/01/23/data-objects-and-being-railroaded-into-misdesign.html">work</a> by Ted Kaminski. In the linked post, he makes a distinction between "data" and "objects", based on the following five characteristics:</p>
@@ -15,7 +17,7 @@
 <li>Abstraction: can I hide the details of how <code>Thing</code> is implemented, or is <code>Thing</code> just data?</li>
 <li>Extensibility: do I have a fixed set of operations for this <code>Thing</code> (that I might be able to evolve through inheritance), or can I write whatever methods?</li>
 </ul>
-<p>I grouped equality and identity because they are <em>the same</em>: a notion of equality induces a notion of identity. Things are identical (have the same identity) if they are equal. The question is whether there is only one notion of equality or multiple. In some languages identity is by-value, i.e. two values are the same if they are bit-for-bit equal. In others identity is by-place, i.e. two values are the same thing only if they are at the same spot in memory.</p>
+<p>I grouped equality and identity because they are the same: a notion of equality induces a notion of identity. Things are identical (have the same identity) if they are equal. The question is whether there is only one notion of equality or multiple. In some languages identity is by-value, i.e. two values are the same if they are bit-for-bit equal. In others identity is by-place, i.e. two values are the same thing only if they are at the same spot in memory.</p>
 
 <h2>Places and values</h2>
 <p>I think this points at a better distinction: <a href="https://without.boats/blog/pinned-places/">places and values</a>.
@@ -92,51 +94,68 @@ You can even adjust the behaviour of an object by replacing the methods by funct
 A language like Java has the <code>private</code> keyword that helps with enforcement.
 </p>
 <p>
-A notion of places is not required for objects to exist.
-You can emulate any object by writing methods that take in the current state of the object and output the new state (along with whatever other data they produce).
-</p>
-<br>
-
-<p>
-Coming from Python, a method on a class is just a function taking an instance of that class, and you can always replace it with your own function.
-There is no such thing as a private method; does that mean that Python does not fall in the "objects" category?
-</p>
-<p>
-I do not think the table is entirely without merit. "Objects" and "data" are clearly pointing at <em>something</em> that a lot of programmers recognize.
-However, I think this thinking <em>in general</em> is muddied, and by looking at it from the perspective of places and values, we can start to tease apart some distinctions.
-</p>
-<h2>"Objects" vs "data", clarified</h2>
-<p>
-If you want to modify things (i.e. have mutability), you need to embrace the fact that places have a value. You have to be able to <em>point</em> to a value to say "modify that one".
-This is not how the "data" or "functional" style operates: we pretend every value we create exists in a diferent place, and so we never have to worry about modifying things, and especially accidentally modifying things.
-</p>
-<p>
-But this alone does not make for an "objects" style, or object-oriented programming. A language like C is definitely not object-oriented, but it does have a notion of place (pointers) and allows you to modify values.
+A notion of places is not required for objects to exist. You can always make any method return <code>self</code> along with whatever result the method has.
+It's a little more cumbersome to write <code>exchange = exchange.start_algorithm(specs)</code> instead of <code>exchange.start_algorithm(specs)</code>, but that's about it.
+As a result, <em>mutability</em> is not required for objects to exist.
 </p>
 
+<h2>Disentangling the mess</h2>
 <p>
-Note that this is separate from the notion of encapsulation. 
+Here's my list of concepts that make the distinction between object-oriented and functional programming.
 </p>
 
 <table>
-<tr><th>Aspect</th><th>Data</th><th>Objects</th></tr>
 <tr>
-  <td>Places</td>
-  <td>No notion of place</td>
-  <td>Objects have a memory address</td>
+  <th>Aspect</th>
+  <th>Definition</th>
+  <th>In object-oriented?</th>
+  <th>In functional?</th>
 </tr>
 <tr>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>Places</td>
+  <td>Programmer can keep track of <em>where</em> values are</td>
+  <td>Usually present, but not required</td>
+  <td>Not present</td>
+</tr>
+<tr>
+  <td>Objects</td>
+  <td>Tying together state and behaviour</td>
+  <td>Yes</td>
+  <td>Usually not</td>
+</tr>
+<tr>
+  <td>Encapsulation/Abstraction</td>
+  <td>Hiding the way something is calculated or done</td>
+  <td>Yes, private methods and state.</td>
+  <td>Yes, wrapping stuff in functions.</td>
 </tr>
 </table>
 
+<p>
+Here's a list of stuff that doesn't. They might be more associated with either one term or the other, but if you are bringing this kind of subject up in a functional-versus-object-oriented discussion, you are actually debating something else.
+</p>
+<table>
+<tr>
+  <th>Aspect</th>
+  <th>Definition</th>
+  <th>Analysis</th>
+</tr>
+<tr>
+  <td>Powerful type systems</td>
+  <td>Type systems that check properties beyond "didn't put an <code>int</code> where I should've put a <code>string</code></td>
+  <td>More associated with functional, since absence of places makes it easier to reason mechanically about code. However, programming languages with places and strong type systems exist: Rust and Typescript are two examples. In the other direction, functional languages with weak type systems also exist: Clojure is a good example.</td>
+</tr>
+<tr>
+  <td>Automated Testing</td>
+  <td>Testing code by running a program that does it for you</td>
+  <td>Some people believe "I have types so I don't need tests". Those people are wrong. The people that say "I have tests so I don't need types" are also wrong. You can automate your tests in any language, and you should probably be testing in any language.</td>
+</tr>
+</table>
 
-
-
-In regular programming, values are data, and places are references, or pointers, or addresses.
-
-
+<h2>Conclusion</h2>
+<p>
+Don't miss the forest for the trees. Next time you get into a discussion about object-oriented versus functional programming, consider what you are <em>actually</em> considering or discussing.
+You might be thinking about places versus values. Or you might be thinking about encapsulation. Or you might be thinking about something else entirely, like type systems or automated testing.
+</p>
 </body>
 </html>
