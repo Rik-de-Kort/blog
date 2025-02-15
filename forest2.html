@@ -45,13 +45,30 @@
 <p>
   Defining good code is not too difficult.
   You don't have to know about SOLID or Monads to write it.
+  Good code is a direct expression of the thing your program needs to do.
+  Whether you use long scripts, an object hierarchy, or something else is mostly irrelevant.
+  Depending on the problem you might use any of those; what matters is the intent.
 </p>
-
+  Now comes a list of tips that should help.
+</p>
+<p>
+  Main advice: make things that are understandable <em>locally</em>.
+  Think to yourself: if my colleague looked at only this bit of the code, would they be able to give me feedback on it without knowing anything else about the project? Examine your code and try to find the hidden dependencies, and find a way to take them out.
+</p>
+<p>
+  This is why I don't like writing classes. There is a lot of information hiding in that little <code>self</code> variable. Your method could be changing anything and everything on it.
+</p>
+<p>
+  When you write a function, declare everything that the function needs in the function signature, and return everything that the function has changed from it.
+  Don't read from any variables outside the function, and especially don't modify any variables that are used outside the function.
+  Your colleague would need to know about the variables outside of the function to understand what was going on.
+  Doing this is called <em>referential transparency</em> and allows you to treat functions as a blackbox.
+  Once you have understood a function which is referentially transparent, you can rely on it to always behave the same way.
+</p>
 <p>
   Watch out for multiple transforms!
   Maybe you take your data from the source in one way, then do a transformation, and then just before doing the real work of your program, you transform it again.
   The best way to get good performance out of your code is to do as little of this as possible.
-  Get the data
 </p>
 
 <p>
