@@ -13,20 +13,47 @@
 <h2>What matters most</h2>
 <p>
   The most important thing in a program is data.
- Whatever kind of program you have, the only thing a computer can do is take data from a place, transform it, and put it in another (or the same) place.
- Elegant programs are precise, clear instructions about what needs to go where.
- Achieving clarity about what needs to happen in terms of data is the first step in writing better code.
- The second step is expressing what needs to happen in terms of data in code.
- The main goal here is to make it obvious to others reading the code what is happening and how it is happening.
+  Whatever kind of program you have, the only thing a computer can do is take data from a place, transform it, and put it in another (or the same) place.
+  Elegant programs are precise, clear instructions about what needs to go where.
+  Achieving clarity about what needs to happen in terms of data is the first step in writing better code.
+  The second step is expressing what needs to happen in terms of data in code.
+  The main goal here is to make it obvious to others reading the code what is happening and how it is happening.
 </p>
 <p>
   So, how can you take the first step, achieving clarity? One tool here is writing: write explicitly down where data is coming from and what it looks like.
- Then write down explicitly where data needs to go and what it looks like.
- Start technical: don't worry too much about what the data means. Instead, focus on where data comes from, what kind of data it is, and what kind of data needs to be produced (numbers, text, ...), where it needs to go (fileshare, database, ...).
-	Talk this sketch of the technical system over with someone and try to make it as simple as possible.
-	Don't write to a fileshare <em>and</em> a database if you can help it, don't write to two tables if you can write to just one, and try to avoid "multiple ways of saying the same thing".
-	This last point already touches on the meaning of the data a little more.
+  Then write down explicitly where data needs to go and what it looks like.
+  Start technical: don't worry too much about what the data means. Instead, focus on where data comes from, what kind of data it is, and what kind of data needs to be produced (numbers, text, ...), where it needs to go (fileshare, database, ...).
+  Talk this sketch of the technical system over with someone and try to make it as simple as possible.
+  The simplest picture is getting info from one system and putting in one other system, both in a single/file/table/etc.
+  Don't read from a fileshare <em>and</em> a database if you can help it, don't write to two tables if you can write to just one, and try to avoid "multiple ways of saying the same thing".
+  This last point already touches on the meaning of the data a little more.
 </p>
+<p>
+  When you have gained some clarity on the technical input and output side of things, you might have more questions.
+  Maybe something depends on what the data transform actually is, what the business value of the program is.
+  You can think about this a long time, but most often I find that this is best figured out by just starting to program, or reworking what I already have.
+  Make sure you can play around with putting in different inputs and observing the outputs.
+  I like to have the test inputs and outputs directly in the program code if at all possible, so I can just look at them, but failing that, a file-based approach can also work.
+</p>
+<p>
+  Writing code like this should give you more clarity as to what you're trying to achieve.
+  It should push you fairly quickly to see if you missed any data sources, and if you have a mismatch between how the data comes out of the systems, and how you would like to think of the data when you transform it.
+  Now that you are writing code, you can start playing around with <em>how</em> you express things.
+</p>
+
+<h2>How to write good code</h2>
+<p>
+  Defining good code is not too difficult.
+  You don't have to know about SOLID or Monads to write it.
+</p>
+
+<p>
+  Watch out for multiple transforms!
+  Maybe you take your data from the source in one way, then do a transformation, and then just before doing the real work of your program, you transform it again.
+  The best way to get good performance out of your code is to do as little of this as possible.
+  Get the data
+</p>
+
 <p>
   Most programs fall in one of two categories.
   The first is a program that runs start-to-finish. Maybe it runs on a timer, every day or every week. The job of the program is usually to take data from somewhere, maybe multiple places, do something to that data, and write the result out somewhere else. Examples of this are a program to predict which partners are not going to deliver their information on time, or a program that calculates the total carbon footprint of the investment portfolio.
