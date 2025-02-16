@@ -1,4 +1,5 @@
 from datetime import date
+import os
 import pandas as pd
 import pyodbc
 
@@ -76,5 +77,5 @@ calculator = CarbonCalculator(
 )
 calculator.calculate_carbon()
 results_df = pd.DataFrame(calculator.carbon_results)
-results_df.to_excel(f'{date.today()}_carbon.xlsx')
+results_df.to_excel(f'{date.today().isoformat()}_carbon.xlsx')
 
