@@ -1,0 +1,120 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rik's Website - Dictionaries</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Ways to write a dictionary/lookup</h1>
+<p>
+Here are some ways you can write a lookup in Python. All of these can be translated to one another, so it's worth it to know this as a pattern that can occur. That way you can make a conscious decision to choose one or the other.
+Thanks to <a href="https://orib.dev/">Ori</a> for inspiring this post. Our talk about state machines was enlightening!
+</p>
+<h3>Using a dictionary</h3>
+<p>Classic.</p>
+<pre>
+    # main.py
+    name_to_age = {'Alice': 37, 'Bob': 21, 'Charlie': 59}
+    print(name_to_age['Alice'])  # Raise KeyError if Alice not found
+    print(name_to_age.get('Alice', 0))  # Print 0 if Alice not found
+</pre>
+
+<h3>As function/if-else statement</h3>
+<p>Every dictionary corresponds to an if-else statement and vice-versa. Rewriting between the two can sometimes come in handy. The if-else is a lot more explicit, which makes it easier to debug, but it's also a lot more verbose. Additionally, a dictionary lookup cannot be anything <em>but</em> a lookup, whereas the if-else is more general and can do pretty much anything it wants, including deleting your system32 or /bin/.</p>
+<pre>
+    # main.py
+    def name_to_age(name: str) -> int:
+        if name == 'Alice':
+            return 37
+        elif name == 'Bob':
+            return 21
+        elif name == 'Charlie':
+            return 59
+        else:
+            # return 0 if you want to reproduce name_to_age.get behaviour
+            raise NameError(f'{name=} not found!')
+
+    print(name_to_age('Alice'))
+</pre>
+
+<h3>Translation between lists</h3>
+<p>Sometimes data is in separate lists (or series, or whatever). This is a simple lookup pattern, just make sure you give the index a good name.</p>
+<pre>
+    # main.py
+    names = ['Alice', 'Bob', 'Charlie']
+    ages = [37, 21, 59]
+    i_name = names.index('Alice')
+    print(ages[i_name])
+</pre>
+<p>If you find yourself doing this a lot with the same data, consider making a helper so you don't need to deal with indexes.</p>
+<pre>
+    name_to_age = dict(zip(names, ages))
+    print(name_to_age('Alice'))
+</pre>
+
+<h3>Zipped list</h3>
+<p>This scenario is also relevant when you have a list of objects. Like <code>Person</code> with attributes <code>name</code> and <code>age</code>.</p>
+<pre>
+    # main.py
+    names_and_ages = [('Alice', 37), ('Bob', 21), ('Charlie', 59)]
+    alice_matches = [age for name, age in names_and_ages if name == 'Alice']
+    if len(alice_matches) != 1:
+        raise ValueError(f'Unexpected number of matches for Alice, got {alice_matches}')
+    print(alice_matches[0])
+</pre>
+
+<p>Here you can also quickly make a helper.</p>
+<pre>
+    name_to_age = {name: age for name, age in names_and_ages}  # verbose but explicit
+    # name_to_age = dict(names_and_ages)  # short
+    print(name_to_age['Alice'])
+</pre>
+
+<h3>Data hiding in index</h3>
+<p>I don't know why you would store the data like this in your own program, but I've seen weirder things.</p>
+<pre>
+    # main.py
+    name_by_age = [None for _ in range(21)] + ['Bob'] + [None for _ in range(37-21-1)] + ['Alice'] + [None for _ in range(59-21-2)] + ['Charlie']
+    print(name_by_age.index('Alice'))
+</pre>
+<p>Flipping data will also work here. Maybe filter out the <code>None</code>s.</p>
+<pre>
+    name_to_age = {name: i for i, name in enumerate(name_by_age) if name is not None}
+    print(name_to_age['Alice'])
+</pre>
+
+<h3>Data hiding in names</h3>
+<p>Imports always do a lookup from name to code. Not seen often, but not too far out there in my opinion.</p>
+<pre>
+    # alice.py
+    age = 37
+    
+    # bob.py
+    age = 21
+
+    # charlie.py
+    age = 59
+
+    # main.py
+    from alice import age
+    print(age)
+</pre>
+
+<p>
+Alternatively you might have something like this.
+</p>
+<pre>
+    # ages.py
+    alice_age = 37
+    bob_age = 21
+    charlie_age = 59
+    
+    # main.py
+    from ages import alice_age
+    print(alice_age)
+</pre>
+
+<small><a href="index.html">home</a></small>
+</body>
+</html>

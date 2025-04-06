@@ -1,0 +1,2 @@
+using Hypothesis with databases
+ways to write a cache -> use explicit dicts, use cahced properties, memoized functions
