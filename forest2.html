@@ -41,34 +41,95 @@
   Now that you are writing code, you can start playing around with <em>how</em> you express things.
 </p>
 
+<h2>High-level structure</h2>
+<p>
+  I'm not very big on up-front design, but a pattern that works well for a lot of programs is to decouple the input/output parts from the data transformation.
+  My ideal programs consist of three steps.
+  <ol>
+    <li>Get all the data (user input, database, configuration, etc.)</li>
+    <li>Do all the data transformation work to the final format</li>
+    <li>Write out the data to where it needs to go</li>
+  </ol>
+
+  In particular, in the middle there is no contact with the outside world.
+  Your data transformation does not go to the database itself, and does not try to read user input.
+</p>
+
 <h2>How to write good code</h2>
 <p>
-  Defining good code is not too difficult.
-  You don't have to know about SOLID or Monads to write it.
   Good code is a direct expression of the thing your program needs to do.
+  You don't have to know about SOLID or Monads to write it.
   Whether you use long scripts, an object hierarchy, or something else is mostly irrelevant.
   Depending on the problem you might use any of those; what matters is the intent.
+  If you are clear on what you want to do and comfortable with the programming language, you can write it.
 </p>
   Now comes a list of tips that should help.
 </p>
 <p>
-  Main advice: make things that are understandable <em>locally</em>.
-  Think to yourself: if my colleague looked at only this bit of the code, would they be able to give me feedback on it without knowing anything else about the project? Examine your code and try to find the hidden dependencies, and find a way to take them out.
-</p>
-<p>
-  This is why I don't like writing classes. There is a lot of information hiding in that little <code>self</code> variable. Your method could be changing anything and everything on it.
+  My main advice: make things that are understandable <em>locally</em>.
+  Think to yourself: if my colleague looked at only this bit of the code, would they be able to give me feedback on it without knowing anything else about the project?
+  Examine your code and try to find the hidden dependencies, and find a way to take them out.
 </p>
 <p>
   When you write a function, declare everything that the function needs in the function signature, and return everything that the function has changed from it.
-  Don't read from any variables outside the function, and especially don't modify any variables that are used outside the function.
+  Don't read from any variables outside the function, and especially don't <em>modify</em> any variables outside the function.
   Your colleague would need to know about the variables outside of the function to understand what was going on.
   Doing this is called <em>referential transparency</em> and allows you to treat functions as a blackbox.
   Once you have understood a function which is referentially transparent, you can rely on it to always behave the same way.
 </p>
 <p>
-  Watch out for multiple transforms!
+  The function below is not referentially transparent.
+  It reads data from the global variables <code>n_cars</code> and <code>price_per_car</code>, and writes data to the variable <code>result</code>.
+  To understand <code>calculate</code>, it's not enough to read the function. You also need to know about the environment surrounding it.
+</p>
+<pre><code>
+n_cars = 24
+price_per_car = 10_000
+result = None
+
+def calculate():
+  global result
+  result = n_cars * price_per_car
+
+calculate()
+print(result)
+</code></pre>
+<p>
+  It's a better idea to make all of this dependency explicit, like below.
+  Now we can reason about the function using only its definition, and we don't need to understand anything else about the program.
+  On top of that, the data flow is explicit: the value of <code>result</code> depends only on <code>n_cars</code> and <code>price_per_car</code>.
+  If we have 15 variables in our program, it's nice to know that you don't need to think about the other 12.
+</p>
+<pre><code>
+def calculate(n_cars, price_per_car):
+  return n_cars * price_per_car
+
+n_cars = 24
+price_per_car = 10_000
+result = calculate(n_cars, price_per_car)
+</code></pre>
+
+<p>
+  This preference for local code is why I don't like classes. That little <code>self</code> variable carries a lot of complexity and potential dependencies! Your method could be changing anything and everything in it.
+</p>
+<p>
+  Also note that for a function to be referentially transparent, <em>it cannot talk to the database or write stuff anywhere</em>. 
+</p>
+<p>
+  Second advice: watch out for multiple transforms!
   Maybe you take your data from the source in one way, then do a transformation, and then just before doing the real work of your program, you transform it again.
-  The best way to get good performance out of your code is to do as little of this as possible.
+  There's a joke that goes "If you improved the performance by 2x, you did something right. If you improved the performance by 10x, you did something clever. But if you improved the performance by 100x, you simply stopped doing something stupid."
+  Try to change the shape of the data only twice: one time when you're reading it from the source, and when you're doing the actual work of the program.
+  In particular, the writing part of your program should be pretty short and obvious, just dumping stuff to the right places.
+</p>
+<p>
+  Third advice: do a little at a time.
+  Your colleague is not as brilliant as you (<em>obviously</em>) so you will need to make it easy for them.
+  It's easier to keep track of only 4 or 5 variables than it is of 15.
+  Sometimes logic is just complicated, and there are a lot of variables that have to go into some function, but see if you can keep it contained.
+</p>
+<p>
+  Note that "little" here depends also on your colleague.
 </p>
 
 <p>
