@@ -6,11 +6,15 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Ways to write a dictionary/lookup</h1>
+<h1>Ways to write a dictionary/lookup in Python</h1>
 <p>
-Here are some ways you can write a lookup in Python. All of these can be translated to one another, so it's worth it to know this as a pattern that can occur. That way you can make a conscious decision to choose one or the other.
+Here are some ways you can write a lookup in Python.
+Not all of these patterns are obviously a lookup, but all of them can be translated to one another, so it's worth to know these patterns.
+That way you can make a conscious decision to choose a specific form.
 Thanks to <a href="https://orib.dev/">Ori</a> for inspiring this post. Our talk about state machines was enlightening!
 </p>
+
+<h2>Different ways to look up</h2>
 <h3>Using a dictionary</h3>
 <p>Classic.</p>
 <pre>
@@ -72,7 +76,7 @@ Thanks to <a href="https://orib.dev/">Ori</a> for inspiring this post. Our talk 
 </pre>
 
 <h3>Data hiding in index</h3>
-<p>I don't know why you would store the data like this in your own program, but I've seen weirder things.</p>
+<p>Here, the age is encoded by the index of the name in the list. It's a little weird, but this is how you might encode a game of life grid, for instance.</p>
 <pre>
     # main.py
     name_by_age = [None for _ in range(21)] + ['Bob'] + [None for _ in range(37-21-1)] + ['Alice'] + [None for _ in range(59-21-2)] + ['Charlie']
@@ -113,6 +117,62 @@ Alternatively you might have something like this.
     # main.py
     from ages import alice_age
     print(alice_age)
+</pre>
+
+<h3>Array could be a dictionary</h3>
+<p>This is often useful in Advent of Code if you have some kind of 2d grid. The most intuitive data structure is a list of lists or a Numpy array.</p>
+<pre>
+    grid = [[1 if x % 2 == 0 and y % 7 == 0 else 0 for x in range(20)] for y in range(20)]
+    print(grid[7][8])
+</pre>
+<p>But this might not be the best solution. Doing things in this array means looking up a coordinate pair, so we can also use a dictionary.</p>
+<pre>
+    grid = {(x, y): 1 if x % 2 == 0 and y % 7 == 0 else 0 for x in range(20) for y in range(20)}
+    print(grid[7, 8])
+</pre>
+
+<h2>Other dictionary patterns</h2>
+<h3>Default value if key not found</h3>
+<p>Sometimes you may write something like this.</p>
+<pre>
+    name_to_age = {'Alice': 37, 'Bob': 21, 'Charlie': 59}
+    if 'Dilbert' in name_to_age:
+        dilbert_age = name_to_age['Dilbert']
+    else:
+        dilbert_age = 88
+</pre>
+<p>Already mentioned up above, you can use <code>get</code> to provide a default argument instead.</p>
+<pre>
+    name_to_age = {'Alice': 37, 'Bob': 21, 'Charlie': 59}
+    print(name_to_age.get('Dilbert', 88))
+</pre>
+
+<h3><code>defaultdict</code> and inverting</h3>
+<p>Say you need to know who is 37.</p>
+<pre>
+    name_to_age = {'Alice': 37, 'Bob': 21, 'Charlie': 59}
+    age_to_name = {v: k for k, v in in name_to_age.items()}
+    print(age_to_name[37])
+</pre>
+<p>This will only work if your values are unique. If Dilbert is also 37, you are not going to find Alice in <code>age_to_name</code>. The solution is to keep a list of keys that map to this value, like so.</p>
+<pre>
+    name_to_age = {'Alice': 37, 'Bob': 21, 'Charlie': 59, 'Dilbert': 37}
+    age_to_name = {v: [] for v in name_to_age.values()}
+    for name, age in name_to_age.items():
+        age_to_name[age].append(name)
+
+    print(age_to_name[37])
+</pre>
+<p>Use <code>defaultdict</code> for this, so you don't need to loop over your collection twice. A <code>defaultdict</code> puts a value provided by the function you give it into the dictionary if it hasn't seen the key before.</p>
+<pre>
+    from collections import defaultdict
+
+    name_to_age = {'Alice': 37, 'Bob': 21, 'Charlie': 59, 'Dilbert': 37}
+    age_to_name = defaultdict(list)
+    for name, age in name_to_age.items():
+        age_to_name[age].append(name)
+
+    print(age_to_name[37])
 </pre>
 
 <small><a href="index.html">home</a></small>
