@@ -64,7 +64,7 @@ I spend most of my time looking at and building software at work, so I'm going t
   The company relies on them and they often play a role no other system was able to, designed to, or could be easily bent to fill (of course ~all systems can be bent to fill any role, given enough effort).
   </p>
   <p>
-  The projects I work on often use an <a href="#TODO">Embrace, Extend, Extinguish</a> kind of tactic.
+  The projects I work on often use an <a href="https://en.wikipedia.org/wiki/Embrace,_extend,_and_extinguish">Embrace, Extend, Extinguish</a> kind of tactic.
   Not always on purpose, but that's how it turns out.
   We first wrap the system and take over responsibility for producing the output, and then rewrite the internal system to be more manageable.
   Surprisingly, this tends to work very well for us, which I think is mostly down to willingness of the users to negotiate and compromise on bug-for-bug compatibility.
@@ -78,7 +78,7 @@ I spend most of my time looking at and building software at work, so I'm going t
   </p>
   <p>
   The "secret sauce" that makes a <em>not</em> vine-like is choosing a set of constraints that encodes domain logic well enough.
-  To <a href="#TODO">define these errors out of existence</a> (the only way to truly solve them), you would build a system that enforces a column to only allow one formula, and use the type system to narrow the allowed function call parameters.
+  To <a href="https://alexkondov.com/program-errors-out-of-existence/">define these errors out of existence</a> (the only way to truly solve them), you would build a system that enforces a column to only allow one formula, and use the type system to narrow the allowed function call parameters.
   This is narrowing of the space of possibilities, not enlarging it.
   </p>
   <p>
@@ -95,8 +95,8 @@ I spend most of my time looking at and building software at work, so I'm going t
   <h3>User perspective</h3>
   <p>
   For a software system to have desireable properties such as correctness, ease of use, and ease of extension (i.e. not be vine-like), the crucial step is to introduce constraints.
-  However, <a href="#TODO">Reality has a surprising amount of detail</a>, and choosing those constraints is difficult: it is not a process that you can learn from a book, and it's much more like an art than a science (although there are plenty of science-y bits).
-  I would recommend <a href="#TODO">David Chapman's writing</a> on the topic.
+  However, <a href="http://johnsalvatier.org/blog/2017/reality-has-a-surprising-amount-of-detail">Reality has a surprising amount of detail</a>, and choosing those constraints is difficult: it is not a process that you can learn from a book, and it's much more like an art than a science (although there are plenty of science-y bits).
+  I would recommend <a href="https://substack.com/@meaningness/p-155249002">David Chapman's writing</a> on the topic.
   </p>
   <p>
   By and large, without specific training, users molding their software are not going to have this skill.
@@ -127,7 +127,7 @@ I spend most of my time looking at and building software at work, so I'm going t
   Rust has <code>unsafe</code>, and my nice portfolio construction application can read and produce Excel files.
   </p>
   <p>
-  Other evidence pointing in the same direction is the fact that for coordination between <code>n</code> actors, you will need <code>n*(n-1)/2</code> communication links, <a href="#TODO">simple ain't easy</a>, etc.
+  Other evidence pointing in the same direction is the fact that for coordination between <code>n</code> actors, you will need <code>n*(n-1)/2</code> communication links, <a href="https://www.youtube.com/watch?v=SxdOUGdseq4">simple made easy</a>, etc.
   I think there is a whole other blog post hiding in here that one could write, but today I'm trying (to quote Robert Capon, who you should read) to outwit the muse, so I'll leave the handwavy argument in place.
   </p>
   <p>
@@ -138,7 +138,7 @@ I spend most of my time looking at and building software at work, so I'm going t
   <p>
   I'm not trying to say there is no improvement possible, but I think there <em>is</em> a limit.
   I strongly believe there is no "magic composition" that makes everything easy and all difficulty melt away.
-  Jamie Brandon sends similar vibes in <a href="#TODO">Things Unlearned</a>.
+  Jamie Brandon sends similar vibes in <a href="https://www.scattered-thoughts.net/writing/things-unlearned/">Things Unlearned</a>.
   </p>
 
   <h2>Conclusion</h2>
