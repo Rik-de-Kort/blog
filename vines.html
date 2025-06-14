@@ -1,0 +1,161 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rik's Website - Vine-like Systems and Malleability</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Vine-like Systems and Malleability</h1>
+  <p>
+I spend most of my time looking at and building software at work, so I'm going to talk a lot about work here, but the observations and arguments generalize.
+  I think specifically about maintaining my Linux configuration (seriously considering just buying a Mac), and various home-grown applications that I've built (still hoping to land that big input-field-replacement in my notetool).
+  </p>
+
+  <h2>Vine-like systems</h2>
+  <p>
+  I often encounter computer systems (spreadsheets, codebases, or patchworks of multiple tools) which have grown to be critical to the business, but are difficult to manage.
+  They have grown like vines, starting from a small point-solution to a problem, and tactically solving problems that come along by doing the easiest thing that will work.
+  Like vines, they are very well-adapted to their environment.
+  The systems solve the problems they are built for very well, often encoding complex (and sometimes contradictory!) business rules.
+  Like vines, they are tangled and complicated.
+  There are parts that used to serve some function, but don't anymore.
+  Strands cross and seem related, but when you look closely, you see that they are completely different parts of the system.
+  <p>
+  Examples of these systems in practice:
+  </p>
+  <ul>
+    <li>
+    A codebase for reporting sustainability metrics: different investment categories had completely different codepaths, which was not obvious at a glance.
+    The codebase made heavy use of indirection and lazy loading so you couldn't easily tell <em>where</em> and <em>when</em> things were calculated or loaded, and the logic of loading data/writing data was tightly intertwined with the actual calculations.
+    The logic for sustainability metrics was well-considered per sustainability metric and per investment category, but there was no overall system, and changing source data meant that it was impossible to re-calculate historic metrics.
+    The project I co-led (shoutout to the data admiral) worked with this and other sustainability models in the organisation and produced an organisation-wide overview.
+    </li><li>
+    An Excel sheet which constructed a portfolio based on return targets from previous analyses.
+    On top of some inscrutable formulas, it linked to several other sheets, one of which had 6 different data sources and had a person whose job it was primarily to keep that sheet up to date.
+    Our project team took this group of sheets and built data pipelines and a web application to make portfolio construction a repeatable, auditable process.
+    The person whose job it would be to keep the sheet up to date now focuses on more advanced analytics.
+    </li><li>
+    A codebase for simulating the economy and getting high-level insight in the balance of assets and liabilities. 
+    The previous iteration of the system was built in APL, and there were holdovers of this in the way code was written: a lot of single-letter variable names, a focus on conciseness rather than legibility.
+    There was a variable <code>rights</code>, but also a variable <code>rights_2</code>, which was only relevant for a specific customer.
+    This codebase has been rewritten once more, without my involvement; I wish the team would hire some software engineers so they wouldn't roll their own testing framework.
+    </li>
+  </ul>
+  <p>
+  Vine-like systems carry low functional risk (meaning they're often very accurate about the problem they're trying to solve), but high technical risk (implementation bugs).
+  Think about a spreadsheet with a wrong formula in cell C125, or an incorrect function call.
+  In my experience they are often quite benign: there's a lot of process around the vine-like system, and people care about the output (it solves a real need!), so outputs get checked often, avoiding catastrophes.
+  However, it's still very common to find implementation errors when auditing, testing, or reimplementing the system.
+  </p>
+  <p>
+  Vine-like systems also grow to be incredibly difficult to extend.
+  Think about trying to introduce a new investment vehicle in your financial model: there are hundreds of formulas, half of which are irrelevant, where are you going start?
+  Or extending the sustainability codebase: a new business line has different reporting requirements, how are you going to get at the reusable bits and pieces?
+  (Before a week or two ago, the codebase included two entirely separate calculation paths, one for the old business lines, and one for the new one.)
+  <p>
+  How to deal with this?
+  </p>
+  <p>
+  The common response to (real) vines that have grown unruly is to cut them down and remove them entirely.
+  I think that is a shame: vines can be a beautiful part of a garden and can take years to grow fully (I still mourn the the shed that my parents used to have, completely overgrown with hedera).
+  In computer systems, it is also often not worth it to just completely remove a vine-like system.
+  The company relies on them and they often play a role no other system was able to, designed to, or could be easily bent to fill (of course ~all systems can be bent to fill any role, given enough effort).
+  </p>
+  <p>
+  The projects I work on often use an <a href="#TODO">Embrace, Extend, Extinguish</a> kind of tactic.
+  Not always on purpose, but that's how it turns out.
+  We first wrap the system and take over responsibility for producing the output, and then rewrite the internal system to be more manageable.
+  Surprisingly, this tends to work very well for us, which I think is mostly down to willingness of the users to negotiate and compromise on bug-for-bug compatibility.
+  </p>
+
+  <h2>Malleability</h2>
+  <p>
+  All of the vine-like systems that I'm thinking of have the property in common that they are made out of malleable software.
+  Either the user has some programming skills, or they are adept at using Excel, Alteryx, Qlik, etc.
+  The malleability of the system is what enables it to adapt so well.
+  </p>
+  <p>
+  The "secret sauce" that makes a <em>not</em> vine-like is choosing a set of constraints that encodes domain logic well enough.
+  To <a href="#TODO">define these errors out of existence</a> (the only way to truly solve them), you would build a system that enforces a column to only allow one formula, and use the type system to narrow the allowed function call parameters.
+  This is narrowing of the space of possibilities, not enlarging it.
+  </p>
+  <p>
+  Similarly, the way to make something extensible is to "cut reality at the seams": to decompose the problem into orthogonal pieces that then fit together nicely.
+  But this is also narrowing the space of possibilities: there's a risk of choosing the wrong seams or missing seams that you should've cut along.
+  </p>
+  <p>
+  The dream of malleable software is that we can enlarge the space of possibilities, users can enjoy more freedom and get more out of their software, without having to rely on software developers to provide it for them.
+  I share that dream.
+  I want to be able to modify my software without first having to download a 150GB code base, learn GNU M4, and figure out what the hell the developers were smoking when they wrote the text renderer.
+  While improvement is almost certainly possible, I'm not optimistic about that dream becoming a reality.
+  </p>
+
+  <h3>User perspective</h3>
+  <p>
+  For a software system to have desireable properties such as correctness, ease of use, and ease of extension (i.e. not be vine-like), the crucial step is to introduce constraints.
+  However, <a href="#TODO">Reality has a surprising amount of detail</a>, and choosing those constraints is difficult: it is not a process that you can learn from a book, and it's much more like an art than a science (although there are plenty of science-y bits).
+  I would recommend <a href="#TODO">David Chapman's writing</a> on the topic.
+  </p>
+  <p>
+  By and large, without specific training, users molding their software are not going to have this skill.
+  And they're not going to want it either.
+  At home, when the audio stack of my Linux (arch btw) is broken and I want to watch a movie with my wife, I'm not going to carefully refactor my configuration to make the fix easy and then make the fix.
+  Instead, I install packages and modify my dotfiles in random ways told to me by the internet (or an LLM) and hope the audio starts working again.
+  Repeat this a couple times, and the result is a big ball of mud which contains (probably) many bugs and I have no hope of ever reproducing from scratch.
+  </p>
+  <p>
+  <small>
+  If this is ever on Hacker News, I would like to impress upon the reader that <em>this is perfectly normal</em>.
+  It is not rational to expect me to curate every last detail of my Linux setup.
+  I could (I certainly have the technical skills to understand everything that's going on), but I don't want to.
+  One rational alternative is to switch to OS, but I haven't found one where I think this wouldn't be an issue.
+  If you "never had any issues", it is because a) you wrote the software, b) you have stockholm syndrome, c) you don't know how to exit Vim and have been stuck there for the past 30 years.
+  </small>
+  </p>
+  <p>
+  Of course, for a lot of low-stakes software this kind of messy ball-of-mud scenario is perfectly okay.
+  It's just that not all scenarios are low-stakes: would you want to write your PhD thesis in a text editor that has a 10% chance of losing all your work?
+  </p>
+
+  <h3>Limits of malleability</h3>
+  <p>
+  Even if constraints were (somehow) introduced to the malleable software, I think a bottleneck is inevitable.
+  Any slightly complicated set of constraints is in theory subject to <a href="https://en.wikipedia.org/wiki/Rice%27s_theorem">Rice's Theorem</a> (any non-trivial property about the system is non-decideable), which immediately implies that there are things that are impossible to do within a certain number of steps (this probably generalizes from a fixed number n to orders, but I haven't thought about it sufficiently).
+  In practice that also happens: whatever system you build, you will probably need an escape hatch.
+  Rust has <code>unsafe</code>, and my nice portfolio construction application can read and produce Excel files.
+  </p>
+  <p>
+  Other evidence pointing in the same direction is the fact that for coordination between <code>n</code> actors, you will need <code>n*(n-1)/2</code> communication links, <a href="#TODO">simple ain't easy</a>, etc.
+  I think there is a whole other blog post hiding in here that one could write, but today I'm trying (to quote Robert Capon, who you should read) to outwit the muse, so I'll leave the handwavy argument in place.
+  </p>
+  <p>
+  I also encounter this in practice: bigger codebases, even when well-maintained, become difficult to work with.
+  Every greenfield project feels like a new start, "we'll do it right this time" in the back of our minds, and somehow we never do.
+  A new way of decomposing a problem devolves into programming language creation.
+  </p>
+  <p>
+  I'm not trying to say there is no improvement possible, but I think there <em>is</em> a limit.
+  I strongly believe there is no "magic composition" that makes everything easy and all difficulty melt away.
+  Jamie Brandon sends similar vibes in <a href="#TODO">Things Unlearned</a>.
+  </p>
+
+  <h2>Conclusion</h2>
+  <p>
+  Vine-like systems are a part of reality: they serve a purpose, and do so very well.
+  There are a lot of aspects that make vine-like systems difficult to work with, but the fundamental thing to remember is that to make a vine-<em>un</em>like system, you need to introduce constraints.
+  </p>
+  <p>
+  Malleable software is great!
+  Software should be more malleable.
+  But not all software <em>can</em> be malleable, because a lack of constraints leads to vine-like systems.
+  And once constraints are introduced, malleability, even for practical use cases, suffers.
+  Given the complexity of "show this button with this text" with all the constraints entailed by variation in e.g. screen sizes, operating systems, hardware implementations, etc.
+  I think it's just <em>hard</em> to allow someone to change any aspect of the button while also doing all that other stuff.
+  </p>
+  <p>
+  Doesn't mean you shouldn't do your very best to try, though.
+  </p>
+  <small><a href="index.html">home</a></small>
+</body>
+</html>
