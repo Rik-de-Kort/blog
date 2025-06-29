@@ -9,7 +9,7 @@
 <body>
   <h1>Vine-like Systems and Malleability</h1>
   <p>
-I spend most of my time looking at and building software at work, so I'm going to talk a lot about work here, but the observations and arguments generalize.
+  I spend most of my time looking at and building software at work, so I'm going to talk a lot about work here, but the observations and arguments generalize.
   I think specifically about maintaining my Linux configuration (seriously considering just buying a Mac), and various home-grown applications that I've built (still hoping to land that big input-field-replacement in my notetool).
   </p>
 
@@ -44,7 +44,7 @@ I spend most of my time looking at and building software at work, so I'm going t
     </li>
   </ul>
   <p>
-  Vine-like systems carry low functional risk (meaning they're often very accurate about the problem they're trying to solve), but high technical risk (implementation bugs).
+  Vine-like systems carry <a href="technical-functional.html">low functional risk (meaning they're often very accurate about the problem they're trying to solve), but high technical risk (implementation bugs)</a>.
   Think about a spreadsheet with a wrong formula in cell C125, or an incorrect function call.
   In my experience they are often quite benign: there's a lot of process around the vine-like system, and people care about the output (it solves a real need!), so outputs get checked often, avoiding catastrophes.
   However, it's still very common to find implementation errors when auditing, testing, or reimplementing the system.
