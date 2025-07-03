@@ -1,0 +1,45 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rik's Website - Put programming advice into context</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Put programming advice into context</h1>
+<p>
+    Context matters a lot when you see programming advice and discussion.
+    For example, consider a program keeping track of whether an item has been viewed or not.
+    One may argue that state should be kept as small as possible: if the information you need is a single bit, use a single bit, no more. Pack your bits if you have to!
+    Another may argue that we are not only interested in this one bit, but down the line also interested <em>when</em> an item was viewed. So really what you want is not a bit, but a timestamp.
+</p>
+
+<p>
+    Both perspectives make sense.
+    When you have are manipulating data in an application, the single bit may be preferable on account of its economy.
+    And should you become interested in when the item was viewed, the change you make to your codebase is probably pretty limited.
+    You will probably only deal with the timestamp in the place where it is relevant, and use the single bit everywhere else.
+</p>
+
+<p>
+    However, when you have a big database that other people are going to use for analytics, new application development, and god-knows-what, it makes sense to store the timestamp rather than the bit!
+    Economy avails us little here (usually): the database is big, the number of rows is limited (what's a couple million among friends, eh?), and evolving the schema is painful.
+    Here I think it makes sense to store the timestamp as representation that's closer to reality and more useful to others.
+    I certainly have never regretted using a timestamp rather than a bit in a database (yet), but I do regret cases where I used a bit rather than a timestamp.
+</p>
+
+<p>
+    Another argument I would make is in the case you are using a high-level language like Python.
+    In Python, trying to twiddle the bits is more or less useless: pretty much everything is a <code>PyObject</code>, which is relatively bulky and will not perform well in any case, so I suspect the bit approach will not yield much better performance than the timestamp approach.
+    Rather, look closely at whether you need the information at all.
+    Nothing at all is more economical than even a single bit!
+</p>
+
+<p>
+    So context matters.
+    A developer building databases will think very differently from a developer using database.
+</p>
+
+<small><a href="index.html">home</a></small>
+</body>
+</html>
