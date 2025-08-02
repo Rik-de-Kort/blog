@@ -9,8 +9,15 @@
 <body>
     <h1>It's programming all the way down</h1>
     <p>
-    The main point of programming is to produce instructions that are executed by a computer [1]. By this definition, you are programming if you are creating or changing the instructions that a computer executes.
+    The main point of programming is to produce instructions that are executed by a computer.
+    By this definition, you are programming if you are creating or changing the instructions that a computer executes.
+    I argue that in a typical write-compile-run scenario, programming can happen at each of those three steps, but the tooling for those steps can be wildly different.
+    My recommendation is to err on the side of write-time programming: use code generators and check in the code they generate rather than trying to use compile-time magic or super-dynamic features.
     </p>
+
+    <div style="display: flex; justify-content: center; width: 100%;">
+        <img src="everything-diagram.png" alt="diagram of points discussed in the blog post" style="border: 1px solid black">
+    </div>
 
     <h2>Compile-time programming</h2>
     <p>
@@ -23,83 +30,95 @@
     So these code modification systems and "normal" programming are two sides of the same coin.
     The only difference lies in when the code is executed.
     This is the insight what caused Zig to have <code>comptime</code>: at compile-time, you program in the same language that you program in normally.
-    </p>
-    <p>
     This is tricky, of course, since the environment that you are compiling in is not the same that you are running the code in (at the very least, time will have passed), but it's an interesting idea against the alternative of having an entirely separate language that you only use once in a blue moon.
     </p>
     <p>
     Another prominent form of compile-time programming happens in type systems.
     Types unlock compiler optimizations because they provide extra information to the compiler about the program, and so influence the code that's being generated.
     More drastically, an incorrectly typed program will fail to compile and not produce any code, which is also an influence on the code being generated.
-    </p>
-    <p>
-    <a href="https://aphyr.com/posts/341-hexing-the-technical-interview">be</a> <a href="https://github.com/codemix/ts-sql">pretty</a> <a href="https://github.com/Dragon-Hatcher/type-system-chess">powerful</a>.
-    </p>
-    <p>
-    Almost all programming languages are Turing complete by design.
-    When type-level programming, the code is executed during compilation of the underlying program (or when running the type checker).
-    When doing regular programming, the code is executed when it is run.
-    Type checking and static analysis typically don't modify the code that is executed when a program is run, but compile-time programming that does is pretty common and popular.
-    Macro systems (such as Rust's or the ones found in various Lisps) are a form of compile-time programming, as are C++-templates and the C-preprocessor.
-    </p>
-    <p>
-    This gives us great power because we get to modify the code as it's being compiled, but it also produces difficulties. The compile-time programming language is often a different language than the run-time programming language. Macros can be difficult to learn, and type-level programs often look like something from another world. This is why <a href="https://ziglang.org">Zig</a>'s <code>comptime</code> keyword is so brilliant. It allows you to execute Zig code (some terms and conditions apply, naturally) <em>while your Zig program is compiling</em>. This neatly sidesteps the multiple language issue, while providing you with the full power that compile-time programming can bring. This also provides a hook for static analyzers to get involved with the compilation process, which I think sounds very exciting.
+    In general, type systems can <a href="https://aphyr.com/posts/341-hexing-the-technical-interview">be</a> <a href="https://github.com/codemix/ts-sql">pretty</a> <a href="https://github.com/Dragon-Hatcher/type-system-chess">powerful</a>.
     </p>
 
     <h2>Run-time programming</h2>
     <p>
-    You can do run-time programming in language that have a mechanism to dynamically generate code while the program is running, and execute it. For instance, you can do this in Python with strings and <code>eval</code>. This allows you to tailor the code that is being run to the data in your program. It's a bit less hip these days because it tends to lead to gigantic security holes if you don't do it very carefully.
+    You can do run-time programming in language that have a mechanism to dynamically generate code while the program is running, and execute it.
+    For instance, you can do this in Python with strings and <code>eval</code>.
+    This allows you to tailor the code that is being run to the data in your program.
+    <code>eval</code> is less popular these days since it tends to lead to massive security holes, but a similar thing happens with class hooks, where you modify a class definition based on data available only when the program is running.
     </p>
     <p>
-    However, this is how almost all programs get executed. If you write Java code, when you compile it gets turned into JVM bytecode. This JVM bytecode gets executed by the JVM runtime (nomen est omen). We say "executed", but what that really means is that the JVM runtime converts bytecode into actual computer instructions. That's creating instructions that a computer executes. Run-time programming! Python does something similar: when the interpreter sees code, it first gets compiled to Python Bytecode, which is then executed on a virtual machine.
+    A bit more mind-bending to think about is the fact that if you write Java code, the compiler turns it into JVM bytecode rather directly into instructions.
+    This JVM bytecode gets executed by the JVM runtime.
+    We say "executed", but what that really means is that the JVM runtime converts bytecode into actual computer instructions.
+    That's creating instructions that a computer executes, and therefore run-time programming! 
     </p>
     <p>
-    A natural question to ask is if we can move run-time programming to compile-time, and we can (usually). This can be done in Python with tools like Numba or Nuitka, but is often difficult because the code produced by run-time programming can depend on user input. And compiling happens ahead of time [2], so the compiler does not have access to it.
+    A natural question to ask is if we can move run-time programming to compile-time.
+    This can be done in Python with tools like Numba or Nuitka and in Java with GraalVM, but is often difficult because the code produced by run-time programming can depend on runtime-known (e.g. user) input.
     </p>
     <p>
-    This observation immediately leads to another: the process of someone using the program or something providing input to the program is also a form of programming! Even though the program is created in a extremely domain-specific language, hand-crafted for the task at hand, it is programming nonetheless.
+    To push the observation to its natural conclusion: the process of using the program or something providing input to the program is also a form of programming!
+    Although the program is created in a extremely domain-specific language, hand-crafted for the task at hand, it is programming nonetheless.
     </p>
 
     <h2>Programming-time programming</h2>
     <p>
-    The problem with both run-time programming and compile-time programming is that is that it can become very hard to keep figure out what exactly is going to happen: you never know if some library is going to hook into your code and rewrite all your classes's <code>__init__</code>-methods. And even if you are "only" using macros or <code>comptime</code>, you are prevented from straightforwardly reading the code top-to-bottom to see what is happening (<a href="./pandas.html">a lot of Object Oriented code is like that regardless</a>, but I digress). Aside from the human element, it also makes static analysis more difficult, meaning your development tools are able to help you less.
+    The problem with both run-time programming and compile-time programming is that is that it can become very hard to keep figure out what exactly is going to happen: you never know if some library is going to hook into your code and rewrite all your classes's <code>__init__</code>-methods.
+    And even if you are "only" using macros or <code>comptime</code>, you are prevented from straightforwardly reading the code top-to-bottom to see what is happening (<a href="./pandas.html">this is also what I don't like about a lot of object-oriented code</a>).
+    Aside from the human element, it also makes static analysis more difficult, meaning your development tools are able to help you less.
     </p>
     <p>
-    An alternative pattern I've taken to using (for instance in <a href="https://github.com/Rik-de-Kort/pydantic-sql-bridge">Pydantic-SQL-bridge</a>) is to generate the code, and keep that as part of the source for the program. I use the computer to write part of the program for me, leading to what you might term "programming-time programming". To the rest of the system that ensures that my code <em>does</em> things (really, code is a mass of inert text that requires tremendous machinery to effect some real change into the world), it is the same as code that I wrote myself. Any and all static analysis can be brought to bear on it, it's just code.
+    An alternative pattern I've taken to using (for instance in <a href="https://github.com/Rik-de-Kort/pydantic-sql-bridge">Pydantic-SQL-bridge</a>) is to generate the code, and keep that as part of the source for the program.
+    I use the computer to write part of the program for me, leading to what you might term "programming-time programming".
+    To the rest of the system that ensures that the code get executed, it is the same as code that I wrote myself.
+    Type-checking, usage search, dead-code analysis, linting, and source control diffs all work great on it!
     </p>
     <p>
-    The tradeoff is that you have to step a bit more careful around the code that you generate. [3] If you modify it, then the generating code becomes useless, and you cannot easily reproduce the generated code, should you need some change in the repetition that made you generate the code in the first place. In practice I find this a worthwhile tradeoff: I work in small teams with responsible adults who know to read the comment at the top of the file that says "GENERATED BY script_x.py DO NOT MODIFY". 
+    The tradeoff is that you have to step a bit more careful around the code that you generate. [1]
+    If you modify the code that you generated, the generating code becomes useless, because it cannot easily reproduce the generated code.
+    In practice I find this a worthwhile tradeoff: I work in small teams with responsible adults who know to read the comment at the top of the file that says "GENERATED BY script_x.py DO NOT MODIFY".
     </p>
 
     <h2>Why is this relevant?</h2>
     <p>
-    It's programming all the way down. Writing code, generating boilerplate in your IDE, modifying code at compile-time, executing the code at run-time, and using the program are all ways to create or modify instructions that the computer executes. This means you should be applying your intuitions about one of these to all the others. Some concrete advice:
+    It's programming all the way down.
+    Writing code, generating boilerplate in your IDE, modifying code at compile-time, executing the code at run-time, and using the program are all ways to create or modify instructions that the computer executes.
+    This means you should be applying your intuitions about one of these to all the others.
+    Some concrete advice:
     </p>
     <ul>
         <li>
-        If you are thinking about adding a prominent button to the user interface which doesn't quite fit but would make it really handy to do this one thing, use your intuition for programming languages. Adding this prominent button the <em>same thing</em> as hacking in this one feature into your codebase. Sometimes, that's a good idea and sometimes that's a bad idea, but the arguments will run the same. Is this use case common enough to deserve such a prominent place? How does the feature play with the others? Is it similar? Can it combine with other features? Of course you can also apply this the other way around if you have some taste in user interfaces, but are less comfortable with software design.
+        If you are thinking about adding a prominent button to the user interface which doesn't quite fit but would make it really handy to do this one thing, use your intuition for programming languages.
+        Adding this prominent button the <em>same thing</em> as hacking in this one feature into your codebase.
+        Sometimes, that's a good idea and sometimes that's a bad idea, but the arguments will run the same.
+        Is this use case common enough to deserve such a prominent place? How does the feature play with the others? Is it similar? Can it combine with other features? Of course you can also apply this the other way around if you have some taste in user interfaces, but are less comfortable with software design.
         </li>
         <li>
-        If you are generating code at compile-time, maybe you should try generating code at programming-time. Bring your regular development tools to bear on it, and see if it helps. Or maybe you should try pushing it into the runtime. Maybe the environment (e.g. the JVM, Python interpreter, the operating system you're running on, etc.) has facilities to solve your problems in a more straightforward way?
+        If you are generating code at compile-time, maybe you should try generating code at programming-time.
+        Bring your regular development tools to bear on it, and see if it helps.
+        Or maybe you should try pushing it into the runtime.
+        Maybe the environment (e.g.
+        the JVM, Python interpreter, the operating system you're running on, etc.) has facilities to solve your problems in a more straightforward way?
         </li>
         <li>
-        Anticipate needs for the niceties of programming-time programming (autocomplete, type checks, version control, testing...). If your users are writing config files, they're going to want an IDE. Good version control should be ubiquitous, it should be possible to undo just about anything. The genius of Nix is that they thought "man, the system configuration should really be in version control".
+        Anticipate needs for the niceties of programming-time programming (autocomplete, type checks, version control, testing...).
+        If your users are writing config files, they're going to want an IDE.
+        Good version control should be ubiquitous, it should be possible to undo just about anything.
+        The genius of Nix is that they thought "man, the system configuration should really be in version control".
         </li>
     </ul>
     <p>
-    That's it! I hope this helps you think about your programs in a new way, and makes you ask new questions of your development process. Here's a diagram to finish it up.
+    That's it!
+    I hope this helps you think about your programs in a new way, and makes you ask new questions of your development process.
     </p>
-
-    <div style="display: flex; justify-content: center; width: 100%;">
-        <img src="everything-diagram.png" alt="diagram of points discussed in the blog post" style="border: 1px solid black">
-    </div>
 
 
     <h2>Footnotes</h2>
     <ol>
-        <li>If the code doesn't execute, it cannot effect the world and it is useless. Therefore the single most important property of a program is that it should execute correctly.</li>
-        <li>Let's not get in the weeds with JIT compilers here</li>
-        <li>This is an example of one of the two hard things in computer science, cache invalidation. We are caching the generated code by writing it to a file on disk. We could generate it on the fly or at compile-time and make sure the generated code always stays in sync with the generating process. But then we cannot easily use static analyzers on the generated code, so it's a tradeoff.</li>
+        <li>
+        This is also an example of the problem of cache invalidation, one of the two hard things in computer science.
+        We are caching the generated code by writing it to a file on disk.
+        </li>
     </ol>
 
     <small><a href="index.html">home</a></small>
