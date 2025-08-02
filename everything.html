@@ -14,13 +14,33 @@
 
     <h2>Compile-time programming</h2>
     <p>
-    One thing that's pretty hip these days is type systems. The main issue with them is that they can <a href="https://aphyr.com/posts/341-hexing-the-technical-interview">be</a> <a href="https://github.com/codemix/ts-sql">pretty</a> <a href="https://github.com/Dragon-Hatcher/type-system-chess">powerful</a>. This is a testament to the fact that <a href="https://gwern.net/turing-complete">Turing completeness is not so difficult to realise</a>. That's the first point.
+    A lot of programming languages grow systems that modify the code at compile-time.
+    C has the preprocessor, Lisp has macros (so does Rust), C++ has templates, Zig has <code>comptime</code>, etc.
     </p>
     <p>
-    Observe that Rust's type system does for Rust what static analysis tools like CPPCheck do for C++. More generally, type checking is a (very privileged) form of static analysis. That's the second point.
+    The system that modifies the code at compile-time is (usually) Turing complete.
+    This is unsurprising, since <a href="https://gwern.net/turing-complete">it's difficult to make systems that are not Turing complete</a>.
+    So these code modification systems and "normal" programming are two sides of the same coin.
+    The only difference lies in when the code is executed.
+    This is the insight what caused Zig to have <code>comptime</code>: at compile-time, you program in the same language that you program in normally.
     </p>
     <p>
-    From these two points we can conclude that type checking and programming are really two sides of the same coin. Type-level programming is just programming. So what's the difference? The time when the code is executed. When type-level programming, the code is executed during compilation of the underlying program (or when running the type checker). When doing regular programming, the code is executed when it is run. Type checking and static analysis typically don't modify the code that is executed when a program is run, but compile-time programming that does is pretty common and popular. Macro systems (such as Rust's or the ones found in various Lisps) are a form of compile-time programming, as are C++-templates and the C-preprocessor.
+    This is tricky, of course, since the environment that you are compiling in is not the same that you are running the code in (at the very least, time will have passed), but it's an interesting idea against the alternative of having an entirely separate language that you only use once in a blue moon.
+    </p>
+    <p>
+    Another prominent form of compile-time programming happens in type systems.
+    Types unlock compiler optimizations because they provide extra information to the compiler about the program, and so influence the code that's being generated.
+    More drastically, an incorrectly typed program will fail to compile and not produce any code, which is also an influence on the code being generated.
+    </p>
+    <p>
+    <a href="https://aphyr.com/posts/341-hexing-the-technical-interview">be</a> <a href="https://github.com/codemix/ts-sql">pretty</a> <a href="https://github.com/Dragon-Hatcher/type-system-chess">powerful</a>.
+    </p>
+    <p>
+    Almost all programming languages are Turing complete by design.
+    When type-level programming, the code is executed during compilation of the underlying program (or when running the type checker).
+    When doing regular programming, the code is executed when it is run.
+    Type checking and static analysis typically don't modify the code that is executed when a program is run, but compile-time programming that does is pretty common and popular.
+    Macro systems (such as Rust's or the ones found in various Lisps) are a form of compile-time programming, as are C++-templates and the C-preprocessor.
     </p>
     <p>
     This gives us great power because we get to modify the code as it's being compiled, but it also produces difficulties. The compile-time programming language is often a different language than the run-time programming language. Macros can be difficult to learn, and type-level programs often look like something from another world. This is why <a href="https://ziglang.org">Zig</a>'s <code>comptime</code> keyword is so brilliant. It allows you to execute Zig code (some terms and conditions apply, naturally) <em>while your Zig program is compiling</em>. This neatly sidesteps the multiple language issue, while providing you with the full power that compile-time programming can bring. This also provides a hook for static analyzers to get involved with the compilation process, which I think sounds very exciting.
