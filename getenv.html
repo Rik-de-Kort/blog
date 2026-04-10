@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rik's Website - Do not use os.getenv</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Do not use <code>os.getenv</code></h1>
+<p>
+    I already saw this pattern a lot with developers from outside the Python system trying to read environment variables, and with the rise of coding agents, it has spread even more.
+    When a model tries to read an environment variable, almost invariably it will reach for <code>os.getenv</code>.
+    This is a bad idea.
+</p>
+<p>
+    <code>os.getenv("VAR_NAME")</code> will return <code>None</code> when the environment does not define VAR_NAME.
+    This almost certainly leads to hard-to-debug errors when the configuration is incorrect.
+    What should be a simple configuration fix turns into a 30 minute bug hunt.
+</p>
+<p>
+    Instead, use <code>os.environ["VAR_NAME"]</code>.
+    This will crash immediately if VAR_NAME is not defined in the environment.
+</p>
+<p>
+    The only circumstance <code>os.getenv</code> <em>might</em> be appropriate is when a environment variable is optional.
+    However, in that case I prefer <code>os.environ.get("VAR_NAME")</code>, which does the exact same thing, but with regular dictionary operations.
+    That way we don't have to keep in mind the special behaviour of <code>os.getenv</code>.
+</p>
+<small><a href="index.html">home</a></small>
+</body>
+</html>
