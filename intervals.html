@@ -1,0 +1,159 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rik's Website - Time intervals should be half-open</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Time intervals should be half-open</h1>
+
+<p>
+If you are modelling time-variant data, time intervals should always be half open: the starting point should be included, and the ending point should be excluded.
+This will make your life easier.
+</p>
+<p>
+For instance, we might be particular about sustainability data that we report on: on certain days, some emissions numbers are used for calculations, and on other days, others.
+This happens in real life: you need to know which emission numbers you were using <em>at the time</em> if you want to make any sense of the progress of your portfolio over time.
+</p>
+<p>
+The point of this post is to convince you that if the emissions per euro invested for AAPL stock were 100.00 mTon CO2e, which is valid from 2025-03-31 up to and including 2026-03-30 (e.g. because we get new data 2026-03-31), you should put 2026-03-31 as your <code>valid_to</code>.
+</p>
+
+
+<h2>Interval adjacency</h2>
+<p>
+Here's a table of emissions data for some company over time where we've done it wrong, i.e. we put 2026-03-30 as <code>valid_to</code>.
+Are there any dates where we don't have data?
+How many days did September have again?
+</p>
+
+<table>
+<tr><th>#</th><th><code>valid_from</code></th><th><code>valid_to</code></th><th><code>emissions_per_eur_invested</th></tr>
+<tr><td>0</td><td>2023-03-31</td><td>2023-09-30</td><td>100</td></tr>
+<tr><td>1</td><td>2023-10-01</td><td>2024-03-31</td><td>115</td></tr>
+<tr><td>2</td><td>2024-04-02</td><td>2025-03-31</td><td>95</td></tr>
+<tr><td>3</td><td>2025-04-01</td><td>2026-03-31</td><td>99</td></tr>
+</table>
+
+<p>
+Now look at the table with the correct definition.
+It's easy to see there's only one gap between rows 1 and 2, we have no data for 2024-04-01, and the code for this is easy to write as well: no need to "convert" a <code>valid_to</code> into the adjacent interval's <code>valid_from</code>.
+All the other <code>valid_to</code> and <code>valid_from</code> dates line up perfectly.
+</p>
+
+<table>
+<tr><th>#</th><th><code>valid_from</code></th><th><code>valid_to</code></th><th><code>emissions_per_eur_invested</th></tr>
+<tr><td>0</td><td>2023-03-31</td><td>2023-10-01</td><td>100</td></tr>
+<tr><td>1</td><td>2023-10-01</td><td>2024-04-01</td><td>115</td></tr>
+<tr><td>2</td><td>2024-04-02</td><td>2025-04-01</td><td>95</td></tr>
+<tr><td>3</td><td>2025-04-01</td><td>2026-04-01</td><td>99</td></tr>
+</table>
+
+<h2>Merging data</h2>
+<p>
+Let's say we have a trusted provider that we would like to get our data from, but they are an artisanal shop and don't cover all of our portfolio.
+We also have a backup provider that doesn't produce quite as reliable numbers, but they do cover a lot more companies.
+We would like to merge the two data feeds, taking into account validity dates.
+</p>
+<p>
+The code [1] is more complicated, so let's start with the correct definition this time.
+We first collect all data from the source tables.
+Then, per company we collect all possible <code>valid_from</code> dates for intervals in the merged data set.
+Data can change at both the starting point and the ending point of each interval [2].
+Then, for each <code>valid_from</code> date, we figure out what data is valid from then on.
+To figure out <code>valid_to</code>, we take either the calculated value for the data, or the <code>valid_from</code> of the next interval, whichever comes first [3].
+</p>
+<pre>
+with trusted_provider as (
+    select company_id, emissions_per_eur_invested, valid_from, valid_to from _TRUSTED_PROVIDER_DATA_TABLE
+), backup_provider as (
+    select company_id, emissions_per_eur_invested, valid_from, valid_to from _BACKUP_PROVIDER_DATA_TABLE
+), valid_from_per_id as (
+    select company_id, valid_from as valid_from from trusted_provider
+    union distinct
+    select company_id, valid_to from trusted_provider
+    union distinct
+    select company_id, valid_from from backup_provider
+    union distinct
+    select company_id, valid_to from backup_provider
+), raw_merge as (
+    select
+        vi.company_id,
+        vi.valid_from,
+        coalesce(tp.valid_to, bp.valid_to) as at_most_valid_to,
+        coalesce(tp.emissions_per_eur_invested, bp.emissions_per_eur_invested) as emissions_per_eur_invested,
+        case when tp.company_id is not null then 'trusted provider' else 'backup provider' end as source
+    from valid_from_per_id vi
+    left join trusted_provider tp on tp.company_id = vi.company_id and tp.valid_from <= vi.valid_from and vi.break_date < tp.valid_to
+    left join backup_provider bp on bp.company_id = vi.company_id and bp.valid_from <= vi.valid_from and vi.break_date < bp.valid_to
+    where tp.company_id is not null or bp.company_id is not null
+)
+select
+    company_id,
+    valid_from,
+    least(at_most_valid_to, lead(valid_from over (partition by company_id order by valid_from asc))) as valid_to,
+    emissions_per_eur_invested,
+    source
+from raw_merge
+</pre>
+<p>
+This code is pretty clean, and the cleanliness comes from the fact that we can consider the <code>valid_to</code> date as the starting point for the next interval!
+If we used the incorrect method, we'd have to apply corrections to timepoints when converting between <code>valid_from</code> and <code>valid_to</code>.
+To do this we need to pick a resolution: if data is valid to 2025-03-31, what is the start date for the next interval where the data is invalid?
+</p>
+<p>
+Below the same query with the incorrect setup for <code>valid_to</code>.
+Our resolution is 1 day.
+It's not <em>much</em> worse, especially if you followed the explanation of the merge query above, but it's another thing to keep in your head while reading the code, just like remembering how many days September has.
+</p>
+
+<pre>
+with trusted_provider as (
+    select company_id, emissions_per_eur_invested, valid_from, valid_to from _TRUSTED_PROVIDER_DATA_TABLE
+), backup_provider as (
+    select company_id, emissions_per_eur_invested, valid_from, valid_to from _BACKUP_PROVIDER_DATA_TABLE
+), valid_from_per_id as (
+    select company_id, valid_from as valid_from from trusted_provider
+    union distinct
+    select company_id, dateadd(day, 1, valid_to) from trusted_provider
+    union distinct
+    select company_id, valid_from from backup_provider
+    union distinct
+    select company_id, dateadd(day, 1, valid_to) from backup_provider
+), raw_merge as (
+    select
+        vi.company_id,
+        vi.valid_from,
+        coalesce(tp.valid_to, bp.valid_to) as at_most_valid_to,
+        coalesce(tp.emissions_per_eur_invested, bp.emissions_per_eur_invested) as emissions_per_eur_invested,
+        case when tp.company_id is not null then 'trusted provider' else 'backup provider' end as source
+    from valid_from_per_id vi
+    left join trusted_provider tp on tp.company_id = vi.company_id and tp.valid_from <= vi.valid_from and vi.break_date < tp.valid_to
+    left join backup_provider bp on bp.company_id = vi.company_id and bp.valid_from <= vi.valid_from and vi.break_date < bp.valid_to
+    where tp.company_id is not null or bp.company_id is not null
+)
+select
+    company_id,
+    valid_from,
+    least(at_most_valid_to, dateadd(day, 1, lead(valid_from over (partition by company_id order by valid_from asc)))) as valid_to,
+    emissions_per_eur_invested,
+    source
+from raw_merge
+</pre>
+
+<h2>Conclusion</h2>
+<p>
+Do it right, make your time intervals half-open: starting point is included, ending point is excluded. A time <code>t</code> is in the interval if <code>valid_from <= t and t < valid_to</code>!
+</p>
+
+<h3>Footnotes</h3>
+<ol>
+<li>Using Snowflake syntax because that's what I've been writing most lately.</li>
+<li>In the example the backup provider's <code>valid_to</code> will never end up as a starting point since we discard rows with empty data. This can change if we have some fields from the backup provider that the trusted provider doesn't deliver at all.</li>
+<li>We could allow rows with NULL data to exist, and then this would not be necessary (and your backup provider's <code>valid_to</code> would show up as a starting point), but then all your columns are nullable.</li>
+</ol>
+
+<small><a href="index.html">home</a></small>
+</body>
+</html>
