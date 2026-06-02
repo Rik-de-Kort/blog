@@ -1,7 +1,9 @@
 body {
-  max-width: 80pc;
-  margin-left: max(1rem, auto);
-  margin-right: max(1rem, auto);
+  max-width: 100ch;
+  margin-left: auto;
+  padding-left: 1rem;
+  margin-right: auto;
+  padding-right: 1rem;
   font-family: sans-serif;
   color: #222;
 }
