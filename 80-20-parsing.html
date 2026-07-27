@@ -1,0 +1,50 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rik's Website - 80/20 parsing</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>80/20-parsing</h1>
+<p>
+Zig day in Boston was a great time!
+I helped hack on a <a href="https://codeberg.org/matklad/zirp">new parser</a> for the Zig programming language.
+I learned two things.
+<ol>
+    <li>
+    We can create a very lean abstract syntax tree by keeping the program text in memory.
+    Then a node in the AST needs to only consist of the node tag (type of node), an index into the program text where the corresponding token starts, and an index into the program text where the node ends.
+    </li>
+    <li>
+    You have the program text anyway, so you can choose to parse only 80 percent of the language features into an AST.
+    For the other 20 percent, instead of operating on the AST, you go look at the program text to see what is happening.
+    </li>
+</p>
+<p>
+An example is parsing the <code>pub</code> modifier keyword in Zig.
+The rules for <code>pub</code> are a bit tricky: it can appear on any container declaration, so every variable definition or function definition in a struct can be <code>pub</code>, but it cannot appear before a local variable definition.
+In effect <code>pub</code> cannot appear inside a function body, and this is a <em>syntax error</em>, not a semantic error.
+</p>
+<p>
+<a href="https://codeberg.org/ziglang/zig/src/branch/master/doc/langref/grammar.peg">Zig's official grammar</a> solves this by creating a new AST node when it encounters <code>pub</code>.
+Then the grammar has separate nodes for container declarations and for function body blocks.
+</p>
+<p>
+The ZIRP (ZIg Resilient Parser) solution is different: when we encounter <code>pub</code>, we skip the token entirely, and just parse what comes after.
+If some consumer of the AST wants to know whether a function declaration is <code>pub</code, they can go back to the program text (or tokenized program text, anyway), and look to see if the keyword is there in the original source.
+This saves us from having to model the <code>pub</code> block in the AST, avoiding extra nodes and complexity.
+</p>
+<p>
+On reflection, this is a specific instance of two general patterns:
+<ol>
+    <li>Sometimes it's better to redo a calculation rather than store the result somewhere.</li>
+    <li>Specializing code to downstream tasks often allows you to skip a bunch of unnecessary work.</li>
+</ol>
+It's probably worth it to write about those in more detail at a later point.
+For now, I'm going to have a go at implementing the other 79 percent of Zig syntax we still need to parse.
+</p>
+<small><a href="index.html">home</a></small>
+</body>
+</html>
