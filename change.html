@@ -1,0 +1,84 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rik's Website - How to affect change in large organisations</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>How to affect change in a large organisation</h1>
+<p>
+    Changing things in a large, bureaucratic organisation is tough.
+    I've been doing this for almost 10 years now and am pretty succesful at it, so I thought I would write down how I generally approach it.
+    The changes I am interested in are pretty large: in this post I'll be illustrating the method by using the story of how we went from a "no build" policy for IT to having a team of developers in house.
+</p>
+<p>
+    When I started my job in 2017, I identified pretty quickly that our investment management organisation would greatly benefit from having official in-house developers.
+    Whenever someone needed a tool, we would sometimes go and buy something of the shelf, but that was a very painful process, so people would use hugely elaborate spreadsheets instead.
+    There were some pockets where people knew how to program, but they didn't get any support.
+    You'd get a Matlab license and a team drive, that's it. No source control, no build environments, nothing.
+    I was really caught by surprise: what do you mean, you build a 50 000 line application and you don't have Git?
+</p>
+<p>
+    I was a trainee at the time and spent time at various departments.
+    As a part of that, I got the chance to go work for the management team of the central IT department.
+    I was supposed to help them write their yearly plans.
+    I distinctly remember our first meeting. A lot of topics and plans were brought up and discussed, but at no point did anyone mention actually talking to the departments that Central IT ostensibly worked for.
+    At one point I piped up and suggested maybe we should synchronize the plans with Investment Management.
+    The director of IT at the time looked at me, irritated, and grumbled "Investment Management doesn't have any IT".
+</p>
+<p>
+    After my traineeship, I was running Innovation's Data Lab, which had as its goal to improve how our company handled data and introduce cloud computing, in a bottom-up way.
+    Bottom-up means that we go talk to people, see what kind of problems they have, and solve those problems.
+    We always contrasted this with the top-down approach where you start a big initiative with a big budget and a thousand stakeholders, spending 9 months coordinating and researching before selecting a vendor halfway through who then starts mucking things up so the project lead leaves and you need someone new coming in who then wants to start over, and you end up three years later with 5 million spent and zero problems solved.
+    We did a lot of experiments this way, but none really provided the lever that we needed to change the "no IT" mindset.
+</p>
+<p>
+    Until we met Harry.
+    He was the head of one the investment teams that was using a set of gigantic spreadsheets to construct their portfolio.
+    Maintaining the sheets was a fulltime job, and the person maintaining the sheets would be retiring soon.
+    Harry asked us if we could automate the sheets away and build a portfolio construction system, and that's basically what we did.
+    What made this a really good project for my purposes are the following aspects.
+</p>
+<ul>
+    <li>It is mission critical: portfolio construction was an essential step in the team's weekly routine.</li>
+    <li>We had top-down cover: as Innovation, we had a license to experiment, and Harry quickly went all-in on this project.</li>
+    <li>Self-build was a clear win: the portfolio was relatively small and concentrated, and the team had some quirky construction rules, so off-the-shelf tools didn't fit.</li>
+</ul>
+<p>
+    We put a team together and built the solution.
+    We got a great response from the users, but of course the tricky bit is to get it out of the lab.
+    Getting there took several years, but by the end of it, there was an in-house team of developers that took over responsibility.
+</p>
+<p>
+    The use case being mission critical meant that there was no easy way to kill it: you would have to create a system that fulfilled the same needs.
+    Harry fought tooth and nail to keep it running because he really needed the system, so this was also legible to management.
+    Importantly, we were also right about self-build being a win. That means <em>we were clearly doing what was best for the company</em>.
+    In the end, our approach to affecting change in Investment Management's IT organisation was to sit, wait, and cooperate.
+</p>
+<p>
+    The "out of spec" system maintained by "the cowboys from Innovation" (we met our SLA year after year without incident) was a big problem for IT management, so they put in a lot of effort to solve it.
+    We were completely transparent about what the system did, how we built it, what went into maintaining it.
+    We happily ran the system while the IT organisation was not ready to do it themselves.
+    We jumped through any bureaucratic hoops that were thrown up, including a model audit.
+    In the end, the IT organisation concluded themselves, through their own process, that they needed in-house developers.
+</p>
+<h2>The playbook</h2>
+<p>
+    Here is how you change a large organisation.
+</p>
+<ol>
+    <li>You find something that is good for the organisation, but that the organisation doesn't yet know about, thinks is impossible, etc..</li>
+    <li>You find a corner of the organisation where you can introduce the change in a mission-critical process.</li>
+    <li>You make sure there is strategic cover for your project in the early stages while you prove out the ideas.</li>
+    <li>You deliver the promised improvement to users. You need them to be advocates, so you must deliver.</li>
+    <li>You are absolutely 100% open and transparent about the change as the organisation tries to digest it. Welcome challenges to your view.</li>
+</ol>
+<p>
+    Right now, I'm trying to see if I can replace on of our main (mission critical) software modules for pension adminstration with something else. I think it's going pretty well.
+</p>
+
+<small><a href="index.html">home</a></small>
+</body>
+</html>
